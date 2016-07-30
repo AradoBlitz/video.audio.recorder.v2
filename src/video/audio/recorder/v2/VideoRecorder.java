@@ -10,6 +10,7 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import com.github.sarxos.webcam.WebcamResolution;
+import com.sun.swing.internal.plaf.synth.resources.synth;
 
 import video.audio.recorder.v2.video.Screen;
 
@@ -17,7 +18,7 @@ public class VideoRecorder {
 
 	private Webcam webcam = Webcam.getDefault();
 
-	public List video = Collections.synchronizedList(new ArrayList<>());
+	public List<BufferedImage> video = new ArrayList<>();
 
 	public VideoRecorder() {
 		webcam.setViewSize(WebcamResolution.VGA.getSize());
@@ -48,14 +49,16 @@ public class VideoRecorder {
 		};
 		webcam.addWebcamListener(camListener);
 	}
-	Screen screen = new Screen();
-	public void play() {
-		
+
+	public synchronized void play() {
+		Screen screen = new Screen();
 		try {
 			System.out.println("Play video");
-			for (Object item : video) {
-				BufferedImage image = (BufferedImage) item;
+			long startTime = System.currentTimeMillis();
+			int counter = 0;
+			for (BufferedImage image : video) {
 				screen.setImage(image);
+				counter += 1;
 				try {
 					TimeUnit.MILLISECONDS.sleep(50);
 				} catch (InterruptedException e) {
@@ -63,6 +66,8 @@ public class VideoRecorder {
 					e.printStackTrace();
 				}
 			}
+			System.out.println("Frames " + counter + " was played in "
+					+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
 		} finally {
 			screen.off();
 		}
@@ -74,9 +79,11 @@ public class VideoRecorder {
 		try {
 			for (int i = 0; i < 1000; i++) {
 				BufferedImage image = webcam.getImage();
-				video.add(image);
+				synchronized (this) {
+					video.add(image);
+				}
 			}
-
+			System.out.println("Recorded frames: " + video.size());
 		} finally {
 			webcam.close();
 		}

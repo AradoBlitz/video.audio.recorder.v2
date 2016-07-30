@@ -1,6 +1,7 @@
 package video.audio.recorder.v2;
 
 import java.io.ByteArrayOutputStream;
+import java.util.concurrent.TimeUnit;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -40,7 +41,9 @@ public class AudioRecorder {
 
 	public void play() {
 		System.out.println("Play audio");
+		long startTime = System.currentTimeMillis();
 		sourceLine.write(audio, 0, audio.length);
+		System.out.println("Audio was played in " + TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
 
 	}
 
@@ -53,7 +56,7 @@ public class AudioRecorder {
 			collector.write(buff, 0, count);
 		}
 		audio = collector.toByteArray();
-		System.out.println("End audio recording");
+		System.out.println("End audio recording. Collected " + audio.length + "bytes.");
 	}
 
 }
