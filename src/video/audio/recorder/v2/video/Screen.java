@@ -11,8 +11,9 @@ public class Screen extends JPanel {
 
 	private Image image;
 
+	private JFrame frame = new JFrame();
+	
 	public Screen(){
-		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);		
 		frame.add(this);	
 		frame.setSize(640, 480);
@@ -30,5 +31,9 @@ public class Screen extends JPanel {
 		
 		super.paintComponent(g);
 		g.drawImage(image, 0, 0, null);
+	}
+
+	public void off() {
+		frame.setVisible(false);		
 	}
 }

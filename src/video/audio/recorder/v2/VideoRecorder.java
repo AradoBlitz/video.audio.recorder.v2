@@ -16,8 +16,6 @@ public class VideoRecorder {
 
 	private Webcam webcam = Webcam.getDefault();
 
-	private Screen screen = new Screen();
-
 	public List<BufferedImage> video = new ArrayList<>();
 
 	public VideoRecorder() {
@@ -51,26 +49,31 @@ public class VideoRecorder {
 	}
 
 	public void play() {
-		for(BufferedImage image:video){
-			screen.setImage(image);
-			try {
-				TimeUnit.MILLISECONDS.sleep(50);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		Screen screen = new Screen();
+		try {
+			for (BufferedImage image : video) {
+				screen.setImage(image);
+				try {
+					TimeUnit.MILLISECONDS.sleep(50);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		}	
+		} finally {
+			screen.off();
+		}
 
 	}
 
 	public void record() {
 		webcam.open();
 		try {
-			for(int i = 0;i<1000;i++){
+			for (int i = 0; i < 1000; i++) {
 				BufferedImage image = webcam.getImage();
 				video.add(image);
 			}
-			
+
 		} finally {
 			webcam.close();
 		}
