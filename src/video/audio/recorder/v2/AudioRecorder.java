@@ -39,6 +39,7 @@ public class AudioRecorder {
 	}
 
 	public void play() {
+		System.out.println("Play audio");
 		sourceLine.write(audio, 0, audio.length);
 
 	}
@@ -47,11 +48,12 @@ public class AudioRecorder {
 		byte[] buff = new byte[1024];
 		int count = 0;
 		ByteArrayOutputStream collector = new ByteArrayOutputStream();
-		for(int i = 0;i<1000;i++){
+		for(int i = 0;i<6000;i++){
 			count = targetLine.read(buff, 0, buff.length);
 			collector.write(buff, 0, count);
 		}
 		audio = collector.toByteArray();
+		System.out.println("End audio recording");
 	}
 
 }

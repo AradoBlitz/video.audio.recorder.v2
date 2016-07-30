@@ -2,6 +2,7 @@ package video.audio.recorder.v2;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +17,7 @@ public class VideoRecorder {
 
 	private Webcam webcam = Webcam.getDefault();
 
-	public List<BufferedImage> video = new ArrayList<>();
+	public List video = Collections.synchronizedList(new ArrayList<>());
 
 	public VideoRecorder() {
 		webcam.setViewSize(WebcamResolution.VGA.getSize());
@@ -47,11 +48,13 @@ public class VideoRecorder {
 		};
 		webcam.addWebcamListener(camListener);
 	}
-
+	Screen screen = new Screen();
 	public void play() {
-		Screen screen = new Screen();
+		
 		try {
-			for (BufferedImage image : video) {
+			System.out.println("Play video");
+			for (Object item : video) {
+				BufferedImage image = (BufferedImage) item;
 				screen.setImage(image);
 				try {
 					TimeUnit.MILLISECONDS.sleep(50);
