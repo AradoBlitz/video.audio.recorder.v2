@@ -11,22 +11,26 @@ public class VideoAudioRecordingTest {
 	private AudioRecorder recorder = new AudioRecorder();
 	private VideoRecorder recorderVideo = new VideoRecorder();
 	
+	private volatile boolean readyToAudioRecord = false;
+	private volatile boolean readyToVideoRecord = false;
+	
+	private volatile boolean readyToAudioPlay = false;
+	private volatile boolean readyToVideoPlay = false;
+	
 	private Thread videoStreamRecorder = new Thread("Video recorder") {
 
 		@Override
 		public void run() {
 
+			readyToVideoRecord = true;
+			while (!readyToVideoRecord && !readyToAudioRecord) {
+				System.out.println("Wait for audio recorder...");
+			}
 			recorderVideo.record();
-			synchronized (this) {
-				notify();
-				synchronized (audioStreamRecorder) {
-					try {
-						audioStreamRecorder.wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+			
+			readyToVideoPlay = true;
+			while (!readyToVideoPlay && !readyToAudioPlay) {
+				System.out.println("Wait for audio player...");
 			}
 			recorderVideo.play();
 		}
@@ -39,13 +43,14 @@ public class VideoAudioRecordingTest {
 		public void run() {
 
 			try {
+				readyToAudioRecord= true;
+				while (!readyToVideoRecord && !readyToAudioRecord) {
+					System.out.println("Wait for video recorder...");
+				}
 				recorder.record();
-				synchronized (this) {
-					notify();
-					synchronized (videoStreamRecorder) {
-						videoStreamRecorder.wait();
-					}
-
+				readyToAudioPlay = true;
+				while (!readyToVideoPlay && !readyToAudioPlay) {
+					System.out.println("Wait for video player...");
 				}
 
 				recorder.play();
