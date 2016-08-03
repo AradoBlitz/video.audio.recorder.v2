@@ -16,11 +16,19 @@ import video.audio.recorder.v2.video.Screen;
 
 public class VideoRecorder {
 
+	private final int frameCount;
+	
 	private Webcam webcam = Webcam.getDefault();
 
 	public List<BufferedImage> video = new ArrayList<>();
 
-	public VideoRecorder() {
+	public VideoRecorder(){
+		this(1000);
+	} 
+	
+	public VideoRecorder(int frameCount) {
+		
+		this.frameCount = frameCount;
 		webcam.setViewSize(WebcamResolution.VGA.getSize());
 		WebcamListener camListener = new WebcamListener() {
 
@@ -77,7 +85,7 @@ public class VideoRecorder {
 	public void record() {
 		webcam.open();
 		try {
-			for (int i = 0; i < 1000; i++) {
+			for (int i = 0; i < frameCount; i++) {
 				BufferedImage image = webcam.getImage();
 				synchronized (this) {
 					video.add(image);

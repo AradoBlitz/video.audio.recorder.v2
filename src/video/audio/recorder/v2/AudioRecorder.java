@@ -9,9 +9,9 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
 
-import sun.security.util.Length;
-
 public class AudioRecorder {
+
+	private final int frameCount;
 
 	public byte[] audio = new byte[0];
 
@@ -23,7 +23,9 @@ public class AudioRecorder {
 	TargetDataLine targetLine;
 	SourceDataLine sourceLine;
 
-	public AudioRecorder() {
+	public AudioRecorder(int frameCount) {
+		
+		this.frameCount = frameCount;
 		try {
 
 			targetLine = (TargetDataLine) AudioSystem.getLine(targetInfo);
@@ -38,6 +40,11 @@ public class AudioRecorder {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public AudioRecorder() {
+		
+		this(1000);
+	}
 
 	public void play() {
 		System.out.println("Play audio");
@@ -51,7 +58,7 @@ public class AudioRecorder {
 		byte[] buff = new byte[1024];
 		int count = 0;
 		ByteArrayOutputStream collector = new ByteArrayOutputStream();
-		for(int i = 0;i<1000;i++){
+		for(int i = 0;i<frameCount;i++){
 			count = targetLine.read(buff, 0, buff.length);
 			collector.write(buff, 0, count);
 		}
