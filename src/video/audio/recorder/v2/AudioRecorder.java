@@ -53,6 +53,14 @@ public class AudioRecorder {
 		System.out.println("Audio was played in " + TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
 
 	}
+	
+	public void play(byte[] audio) {
+		System.out.println("Play audio");
+		long startTime = System.currentTimeMillis();
+		sourceLine.write(audio, 0, audio.length);
+		System.out.println("Audio was played in " + TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
+
+	}
 
 	public void record() throws Exception{
 		byte[] buff = new byte[1024];

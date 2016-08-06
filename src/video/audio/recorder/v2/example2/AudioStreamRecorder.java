@@ -8,6 +8,7 @@ import video.audio.recorder.v2.AudioRecorder;
 public class AudioStreamRecorder extends Thread {
 
 	private AudioRecorder recorder;
+	public boolean stop;
 
 	public AudioStreamRecorder(AudioRecorder recorder) {
 		this.recorder = recorder;
@@ -20,7 +21,7 @@ public class AudioStreamRecorder extends Thread {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!stop) {
 			try {
 				recorder.record();
 			} catch (Exception e) {

@@ -9,6 +9,7 @@ import video.audio.recorder.v2.VideoRecorder;
 public class VideoStreamRecorder extends Thread {
 
 	private VideoRecorder recorderVideo;
+	public boolean stop;
 
 	public VideoStreamRecorder(VideoRecorder recorderVideo) {
 		this.recorderVideo = recorderVideo;
@@ -19,7 +20,7 @@ public class VideoStreamRecorder extends Thread {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!stop) {
 			recorderVideo.record();
 		}
 	}
