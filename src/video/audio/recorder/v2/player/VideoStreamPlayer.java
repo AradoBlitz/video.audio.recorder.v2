@@ -20,11 +20,11 @@ public class VideoStreamPlayer extends Thread {
 			while (!stop) {
 				System.out.println("Play video");
 				long startTime = System.currentTimeMillis();
-				int counter = 0;
+				
 				for (int i = counter; i < imagesToPlay.size(); i++) {
 
 					screen.setImage(imagesToPlay.get(i));
-					counter += 1;
+					
 					try {
 						TimeUnit.MILLISECONDS.sleep(50);
 					} catch (InterruptedException e) {
@@ -32,7 +32,7 @@ public class VideoStreamPlayer extends Thread {
 						e.printStackTrace();
 					}
 				}
-				System.out.println("Frames " + counter + " was played in "
+				System.out.println("Frames " + imagesToPlay.size() + " was played in "
 						+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
 			}
 		} finally {

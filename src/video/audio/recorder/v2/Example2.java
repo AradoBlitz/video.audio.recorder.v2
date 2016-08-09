@@ -37,7 +37,7 @@ public class Example2 {
 		for (int i = 0; i < 1; i++) {
 			System.out.println("Iteration #"+ i);
 			collectedImages.addAll(videoStreamRecorder.getCollectedImages());
-			collectedSoundBytes.add(audioStreamRecorder.getCollectedSound());
+			collectedSoundBytes.addAll(audioStreamRecorder.getCollectedSound());
 		}
 
 	/*	assertEquals(1000, collectedSoundBytes.size());
@@ -59,11 +59,11 @@ public class Example2 {
 		TimeUnit.SECONDS.sleep(30);
 		
 		List<BufferedImage> imagesToPlay = new ArrayList<>();
-		for (int i = 0; i < 100 && i < collectedImages.size(); i++)
+		for (int i = 0; i < collectedImages.size(); i++)
 			imagesToPlay.add(collectedImages.get(i));
 
 		List<byte[]> audioBytesToPlay = new ArrayList<>();
-		for (int i = 0; i < 15 && i < collectedSoundBytes.size(); i++)
+		for (int i = 0; i < collectedSoundBytes.size(); i++)
 			audioBytesToPlay.add(collectedSoundBytes.get(i));
 		
 		audioStreamPlayer.play(audioBytesToPlay);
