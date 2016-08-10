@@ -58,16 +58,8 @@ public class Example2 {
 		}
 		TimeUnit.SECONDS.sleep(30);
 		
-		List<BufferedImage> imagesToPlay = new ArrayList<>();
-		for (int i = 0; i < collectedImages.size(); i++)
-			imagesToPlay.add(collectedImages.get(i));
-
-		List<byte[]> audioBytesToPlay = new ArrayList<>();
-		for (int i = 0; i < collectedSoundBytes.size(); i++)
-			audioBytesToPlay.add(collectedSoundBytes.get(i));
-		
-		audioStreamPlayer.play(audioBytesToPlay);
-		videoStreamPlayer.play(imagesToPlay);
+		audioStreamPlayer.play(collectedSoundBytes);
+		videoStreamPlayer.play(collectedImages);
 		
 		
 		TimeUnit.SECONDS.sleep(222);
