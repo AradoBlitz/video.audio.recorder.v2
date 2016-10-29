@@ -98,9 +98,14 @@ public class VideoRecorder {
 
 	}
 	
+	public void clearBuffer() {
+		video.clear();		
+	}
+	
 	public static void main(String[] args) {
 		VideoRecorder videoRecorder = new VideoRecorder(50);
 		while (true) {
+			videoRecorder.clearBuffer();
 			videoRecorder.record();
 			videoRecorder.play();
 		}
