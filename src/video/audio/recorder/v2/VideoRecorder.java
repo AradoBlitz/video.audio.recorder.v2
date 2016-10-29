@@ -99,7 +99,7 @@ public class VideoRecorder {
 	}
 	
 	public static void main(String[] args) {
-		VideoRecorder videoRecorder = new VideoRecorder();
+		VideoRecorder videoRecorder = new VideoRecorder(50);
 		while (true) {
 			videoRecorder.record();
 			videoRecorder.play();
