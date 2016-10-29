@@ -73,5 +73,18 @@ public class AudioRecorder {
 		audio = collector.toByteArray();
 		System.out.println("End audio recording. Collected " + audio.length + "bytes.");
 	}
+	
+	public static void main(String[] args) {
+		AudioRecorder recorder = new AudioRecorder();
+		try{
+		while (true) {
+			recorder.record();
+			recorder.play();
+		}
+		} catch (Exception e) {
+			// TODO: handle exception
+			throw new RuntimeException(e);
+		}
+	}
 
 }
