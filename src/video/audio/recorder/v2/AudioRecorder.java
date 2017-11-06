@@ -1,6 +1,8 @@
 package video.audio.recorder.v2;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.sound.sampled.AudioFormat;
@@ -22,6 +24,12 @@ public class AudioRecorder {
 
 	TargetDataLine targetLine;
 	SourceDataLine sourceLine;
+
+	private List<Long> time = new ArrayList<>();
+
+	private int soundItem = 0;
+
+	private List<byte[]> audioCollector = new ArrayList<>();
 
 	public AudioRecorder(int frameCount) {
 		
@@ -69,6 +77,10 @@ public class AudioRecorder {
 		for(int i = 0;i<frameCount;i++){
 			count = targetLine.read(buff, 0, buff.length);
 			collector.write(buff, 0, count);
+			time.add(System.currentTimeMillis());
+			ByteArrayOutputStream convertor = new ByteArrayOutputStream();
+			convertor.write(buff, 0, count);
+			audioCollector.add(convertor.toByteArray());
 		}
 		audio = collector.toByteArray();
 		System.out.println("End audio recording. Collected " + audio.length + "bytes.");
@@ -85,6 +97,17 @@ public class AudioRecorder {
 			// TODO: handle exception
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void play(Long timeSlot) {
+		System.out.println("Play audio");
+		while(soundItem<time.size()&&timeSlot>=(time.get(soundItem))){			
+			long startTime = System.currentTimeMillis();
+			byte[] audio = audioCollector.get(soundItem);
+			sourceLine.write(audio, 0, audio.length);
+			soundItem+=1;
+			System.out.println("Audio was played in " + TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
+		}		
 	}
 
 }

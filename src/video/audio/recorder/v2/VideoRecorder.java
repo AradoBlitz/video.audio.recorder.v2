@@ -2,7 +2,6 @@ package video.audio.recorder.v2;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -10,24 +9,24 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import com.github.sarxos.webcam.WebcamResolution;
-import com.sun.swing.internal.plaf.synth.resources.synth;
-
 import video.audio.recorder.v2.video.Screen;
 
 public class VideoRecorder {
 
 	private final int frameCount;
-	
+
 	private Webcam webcam = Webcam.getDefault();
 
 	public List<BufferedImage> video = new ArrayList<>();
 
-	public VideoRecorder(){
+	private List<Long> time = new ArrayList<>(); 
+
+	public VideoRecorder() {
 		this(1000);
-	} 
-	
+	}
+
 	public VideoRecorder(int frameCount) {
-		
+
 		this.frameCount = frameCount;
 		webcam.setViewSize(WebcamResolution.VGA.getSize());
 		WebcamListener camListener = new WebcamListener() {
@@ -81,27 +80,51 @@ public class VideoRecorder {
 		}
 
 	}
-
-	public void record() {
-		webcam.open();
+	
+	public synchronized void play(AudioRecorder audioRecorder) {
+		Screen screen = new Screen();
 		try {
-			for (int i = 0; i < frameCount; i++) {
-				BufferedImage image = webcam.getImage();
-				synchronized (this) {
-					video.add(image);
-				}
+			System.out.println("Play video");
+			long startTime = System.currentTimeMillis();
+			int counter = 0;
+			
+			for (int i = 0; i<video.size();i++) {
+				screen.setImage(video.get(i));
+				counter += 1;
+				audioRecorder.play(i+1<time.size()?time.get(i+1):i);
 			}
-			System.out.println("Recorded frames: " + video.size());
+			System.out.println("Frames " + counter + " was played in "
+					+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
 		} finally {
-			webcam.close();
+			screen.off();
 		}
 
 	}
-	
-	public void clearBuffer() {
-		video.clear();		
+
+	public void record() {
+
+		for (int i = 0; i < frameCount; i++) {
+			BufferedImage image = webcam.getImage();
+			synchronized (this) {
+				video.add(image);
+				time.add(System.currentTimeMillis());
+			}
+		}
+		System.out.println("Recorded frames: " + video.size());
 	}
-	
+
+	public void activateCam() {
+		webcam.open();
+	}
+
+	public void deactivateCam() {
+		webcam.close();
+	}
+
+	public void clearBuffer() {
+		video.clear();
+	}
+
 	public static void main(String[] args) {
 		VideoRecorder videoRecorder = new VideoRecorder(50);
 		while (true) {
