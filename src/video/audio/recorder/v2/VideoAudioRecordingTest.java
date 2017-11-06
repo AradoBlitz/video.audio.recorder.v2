@@ -2,8 +2,6 @@ package video.audio.recorder.v2;
 
 import static org.junit.Assert.*;
 
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Test;
 
 import parallel.processing.sample.StartFlag;
