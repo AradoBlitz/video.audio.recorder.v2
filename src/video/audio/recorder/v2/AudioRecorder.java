@@ -54,7 +54,7 @@ public class AudioRecorder {
 		this(1000);
 	}
 
-	public void play() {
+	private void play() {
 		System.out.println("Play audio");
 		long startTime = System.currentTimeMillis();
 		sourceLine.write(audio, 0, audio.length);
@@ -62,7 +62,7 @@ public class AudioRecorder {
 
 	}
 	
-	public void play(byte[] audio) {
+	private void play(byte[] audio) {
 		System.out.println("Play audio");
 		long startTime = System.currentTimeMillis();
 		sourceLine.write(audio, 0, audio.length);

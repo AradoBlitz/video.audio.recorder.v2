@@ -6,54 +6,36 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
+import parallel.processing.sample.StartFlag;
+
 public class VideoAudioRecordingTest {
 
-	private AudioRecorder recorder = new AudioRecorder();
-	private VideoRecorder recorderVideo = new VideoRecorder();
+	private AudioRecorder audio = new AudioRecorder(2000);
+	private VideoRecorder video = new VideoRecorder(110);
+	private StartFlag startFlag = new StartFlag();
 	
-	private volatile boolean readyToAudioRecord = false;
-	private volatile boolean readyToVideoRecord = false;
-	
-	private volatile boolean readyToAudioPlay = false;
-	private volatile boolean readyToVideoPlay = false;
-	
-	private Thread videoStreamRecorder = new Thread("Video recorder") {
-
+	private Thread videoStreamRecorder = new Thread("videoRecorder") {
 		@Override
 		public void run() {
-
-			readyToVideoRecord = true;
-			while (!readyToVideoRecord && !readyToAudioRecord) {
-				System.out.println("Wait for audio recorder...");
-			}
-			recorderVideo.record();
 			
-			readyToVideoPlay = true;
-			while (!readyToVideoPlay && !readyToAudioPlay) {
-				System.out.println("Wait for audio player...");
+			try {
+				startFlag.syncLine();
+				System.out.println("Go!");//help to know to start counting.
+				video.record();
+			} finally {
+				video.deactivateCam();
 			}
-			recorderVideo.play();
 		}
-
 	};
 
-	private Thread audioStreamRecorder = new Thread("Audio recorder") {
+	private Thread audioStreamRecorder =  new Thread("audioRecorder") {
 
 		@Override
 		public void run() {
 
 			try {
-				readyToAudioRecord= true;
-				while (!readyToVideoRecord && !readyToAudioRecord) {
-					System.out.println("Wait for video recorder...");
-				}
-				recorder.record();
-				readyToAudioPlay = true;
-				while (!readyToVideoPlay && !readyToAudioPlay) {
-					System.out.println("Wait for video player...");
-				}
-
-				recorder.play();
+				startFlag.syncLine();
+				audio.record();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -66,27 +48,37 @@ public class VideoAudioRecordingTest {
 	@Test
 	public void captureAudio() throws Exception {
 
-		recorder.record();
-		recorder.play();
-		assertTrue("Shouldn't be empty", recorder.audio.length > 1);
+		audio.record();
+		audio.play(System.currentTimeMillis());
+		assertTrue("Shouldn't be empty", audio.audio.length > 1);
 	}
 
 	@Test
 	public void captureVideo() throws Exception {
 
-		recorderVideo.record();
-		recorderVideo.play();
-		assertTrue("Shouldn`t be empty", recorderVideo.video.size() > 1);
+		video.record();
+		video.play(new AudioRecorder(){
+
+			@Override
+			public void play(Long timeSlot) {
+				// TODO Auto-generated method stub
+				assertTrue(timeSlot!=0);
+			}
+			
+		});
+		assertTrue("Shouldn`t be empty", video.video.size() > 1);
 	}
 
 	@Test
 	public void captureAudioAndVideo() throws Exception {
-
+		video.activateCam();
 		videoStreamRecorder.start();
 		audioStreamRecorder.start();
 
 		videoStreamRecorder.join();
 		audioStreamRecorder.join();
+		
+		video.play(audio);
 
 	}
 }
