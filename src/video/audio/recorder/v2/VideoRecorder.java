@@ -56,30 +56,6 @@ public class VideoRecorder {
 		};
 		webcam.addWebcamListener(camListener);
 	}
-
-	private synchronized void play() {
-		Screen screen = new Screen();
-		try {
-			System.out.println("Play video");
-			long startTime = System.currentTimeMillis();
-			int counter = 0;
-			for (BufferedImage image : video) {
-				screen.setImage(image);
-				counter += 1;
-				try {
-					TimeUnit.MILLISECONDS.sleep(50);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			System.out.println("Frames " + counter + " was played in "
-					+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
-		} finally {
-			screen.off();
-		}
-
-	}
 	
 	public synchronized void play(AudioRecorder audioRecorder) {
 		Screen screen = new Screen();
@@ -102,7 +78,6 @@ public class VideoRecorder {
 	}
 
 	public void record() {
-
 		for (int i = 0; i < frameCount; i++) {
 			BufferedImage image = webcam.getImage();
 			synchronized (this) {
@@ -123,15 +98,6 @@ public class VideoRecorder {
 
 	public void clearBuffer() {
 		video.clear();
-	}
-
-	public static void main(String[] args) {
-		VideoRecorder videoRecorder = new VideoRecorder(50);
-		while (true) {
-			videoRecorder.clearBuffer();
-			videoRecorder.record();
-			videoRecorder.play();
-		}
 	}
 
 }

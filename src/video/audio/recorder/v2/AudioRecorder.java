@@ -15,15 +15,14 @@ public class AudioRecorder {
 
 	private final int frameCount;
 
-	public byte[] audio = new byte[0];
 
-	AudioFormat format = new AudioFormat(44100, 16, 2, true, true);
+	private AudioFormat format = new AudioFormat(44100, 16, 2, true, true);
 
-	DataLine.Info targetInfo = new DataLine.Info(TargetDataLine.class, format);
-	DataLine.Info sourceInfo = new DataLine.Info(SourceDataLine.class, format);
+	private DataLine.Info targetInfo = new DataLine.Info(TargetDataLine.class, format);
+	private DataLine.Info sourceInfo = new DataLine.Info(SourceDataLine.class, format);
 
-	TargetDataLine targetLine;
-	SourceDataLine sourceLine;
+	private TargetDataLine targetLine;
+	private SourceDataLine sourceLine;
 
 	private List<Long> time = new ArrayList<>();
 
@@ -54,59 +53,26 @@ public class AudioRecorder {
 		this(1000);
 	}
 
-	private void play() {
-		System.out.println("Play audio");
-		long startTime = System.currentTimeMillis();
-		sourceLine.write(audio, 0, audio.length);
-		System.out.println("Audio was played in " + TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
-
-	}
-	
-	private void play(byte[] audio) {
-		System.out.println("Play audio");
-		long startTime = System.currentTimeMillis();
-		sourceLine.write(audio, 0, audio.length);
-		System.out.println("Audio was played in " + TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
-
-	}
-
 	public void record() throws Exception{
 		byte[] buff = new byte[1024];
-		int count = 0;
-		ByteArrayOutputStream collector = new ByteArrayOutputStream();
+		int count = 0;		
 		for(int i = 0;i<frameCount;i++){
 			count = targetLine.read(buff, 0, buff.length);
-			collector.write(buff, 0, count);
 			time.add(System.currentTimeMillis());
 			ByteArrayOutputStream convertor = new ByteArrayOutputStream();
 			convertor.write(buff, 0, count);
 			audioCollector.add(convertor.toByteArray());
 		}
-		audio = collector.toByteArray();
-		System.out.println("End audio recording. Collected " + audio.length + "bytes.");
-	}
-	
-	public static void main(String[] args) {
-		AudioRecorder recorder = new AudioRecorder();
-		try{
-		while (true) {
-			recorder.record();
-			recorder.play();
-		}
-		} catch (Exception e) {
-			// TODO: handle exception
-			throw new RuntimeException(e);
-		}
+
+		System.out.println("End audio recording. Collected " + audioCollector + "bytes.");
 	}
 
 	public void play(Long timeSlot) {
 		System.out.println("Play audio");
-		while(soundItem<time.size()&&timeSlot>=(time.get(soundItem))){			
-			long startTime = System.currentTimeMillis();
+		while(soundItem<time.size()&&timeSlot>=(time.get(soundItem))){
 			byte[] audio = audioCollector.get(soundItem);
 			sourceLine.write(audio, 0, audio.length);
 			soundItem+=1;
-			System.out.println("Audio was played in " + TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
 		}		
 	}
 
