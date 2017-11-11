@@ -8,7 +8,7 @@ import parallel.processing.sample.StartFlag;
 
 public class VideoAudioRecordingTest {
 
-	private AudioRecorder audio = new AudioRecorder(2000);
+	private AudioPlayer audio = new AudioPlayer(2000);
 	private VideoRecorder video = new VideoRecorder(110);
 	private StartFlag startFlag = new StartFlag();
 	
@@ -55,7 +55,7 @@ public class VideoAudioRecordingTest {
 	public void captureVideo() throws Exception {
 
 		video.record();
-		video.play(new AudioRecorder(){
+		video.play(new AudioPlayer(){
 
 			@Override
 			public void play(Long timeSlot) {

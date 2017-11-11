@@ -57,7 +57,7 @@ public class VideoRecorder {
 		webcam.addWebcamListener(camListener);
 	}
 	
-	public synchronized void play(AudioRecorder audioRecorder) {
+	public void play(AudioPlayer audioRecorder) {
 		Screen screen = new Screen();
 		try {
 			System.out.println("Play video");
