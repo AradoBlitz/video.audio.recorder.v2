@@ -15,18 +15,10 @@ import video.audio.recorder.v2.video.Screen;
 
 public class VideoPlayer extends VideoRecorder {
 
-	private final int frameCount;
+	private final VideoRecorder source;	 
 
-	 
-
-	public VideoPlayer() {
-		this(1000);
-	}
-
-	public VideoPlayer(int frameCount) {
-
-		this.frameCount = frameCount;
-		
+	public VideoPlayer(VideoRecorder source) {
+		this.source = source;		
 	}
 	
 	public void play(AudioPlayer audioRecorder) {
@@ -37,10 +29,10 @@ public class VideoPlayer extends VideoRecorder {
 			int counter = 0;
 			
 			BufferedImage image;
-			for (int i = 0; (image=getImage(i))!=null;i++) {
+			for (int i = 0; (image=source.getImage(i))!=null;i++) {
 				screen.setImage(image);
 				counter += 1;
-				audioRecorder.play(0!=getTime(i+1)?getTime(i+1):getTime(i));
+				audioRecorder.play(0!=source.getTime(i+1)?source.getTime(i+1):source.getTime(i));
 			}
 			System.out.println("Frames " + counter + " was played in "
 					+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
@@ -51,9 +43,9 @@ public class VideoPlayer extends VideoRecorder {
 	}
 
 
-	public void record() {
+	public void record(int frameCount) {
 		for (int i = 0; i < frameCount; i++) {
-			super.record();
+			source.record();
 		}		
 	}
 

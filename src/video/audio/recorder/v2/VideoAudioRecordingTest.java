@@ -10,7 +10,9 @@ public class VideoAudioRecordingTest {
 
 	private AudioRecorder audioSource = new AudioRecorder();
 	private AudioPlayer audio = new AudioPlayer(audioSource);
-	private VideoPlayer video = new VideoPlayer(110);
+	
+	private VideoRecorder videoSource = new VideoRecorder();
+	private VideoPlayer video = new VideoPlayer(videoSource);
 	private StartFlag startFlag = new StartFlag();
 	
 	private Thread videoStreamRecorder = new Thread("videoRecorder") {
@@ -20,7 +22,7 @@ public class VideoAudioRecordingTest {
 			try {
 				startFlag.syncLine();
 				System.out.println("Go!");//help to know to start counting.
-				video.record();
+				video.record(110);
 			} finally {
 				video.deactivateCam();
 			}
@@ -55,7 +57,7 @@ public class VideoAudioRecordingTest {
 	@Test
 	public void captureVideo() throws Exception {
 
-		video.record();
+		video.record(110);
 		video.play(new AudioPlayer(null){
 
 			@Override
