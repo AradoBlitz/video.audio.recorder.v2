@@ -10,7 +10,7 @@ public class VideoAudioRecordingTest {
 
 	private AudioRecorder audioSource = new AudioRecorder();
 	private AudioPlayer audio = new AudioPlayer(audioSource);
-	private VideoRecorder video = new VideoRecorder(110);
+	private VideoPlayerRecorder video = new VideoPlayerRecorder(110);
 	private StartFlag startFlag = new StartFlag();
 	
 	private Thread videoStreamRecorder = new Thread("videoRecorder") {

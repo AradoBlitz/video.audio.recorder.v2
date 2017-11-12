@@ -11,7 +11,7 @@ import com.github.sarxos.webcam.WebcamListener;
 import com.github.sarxos.webcam.WebcamResolution;
 import video.audio.recorder.v2.video.Screen;
 
-public class VideoRecorder {
+public class VideoPlayerRecorder {
 
 	private final int frameCount;
 
@@ -21,11 +21,11 @@ public class VideoRecorder {
 
 	private List<Long> time = new ArrayList<>(); 
 
-	public VideoRecorder() {
+	public VideoPlayerRecorder() {
 		this(1000);
 	}
 
-	public VideoRecorder(int frameCount) {
+	public VideoPlayerRecorder(int frameCount) {
 
 		this.frameCount = frameCount;
 		webcam.setViewSize(WebcamResolution.VGA.getSize());
