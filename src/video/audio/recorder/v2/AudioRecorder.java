@@ -47,12 +47,14 @@ public class AudioRecorder {
 	}
 	
 	public byte[] getAudiouData(int soundItem) {
-		// TODO Auto-generated method stub
-		return audioCollector.get(soundItem);
+		if(soundItem<audioCollector.size())
+			return audioCollector.get(soundItem);
+		return null;
 	}
 
-	public Long getTime(int soundItem) {
-
-		return time.get(soundItem);
+	public long getTime(int soundItem) {
+		if(soundItem<time.size())
+			return time.get(soundItem);
+		return 0;
 	}
 }

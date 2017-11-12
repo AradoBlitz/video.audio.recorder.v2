@@ -41,10 +41,10 @@ public class AudioPlayer extends AudioRecorder {
 
 	
 
-	public void play(Long timeSlot) {
+	public void play(long timeBorder) {
 		System.out.println("Play audio");
-		while(soundItem<time.size()&&timeSlot>=(getTime(soundItem))){
-			byte[] audio = getAudiouData(soundItem);
+		byte[] audio;
+		while(timeBorder>getTime(soundItem)&&(audio=getAudiouData(soundItem))!=null){			
 			sourceLine.write(audio, 0, audio.length);
 			soundItem+=1;
 		}		

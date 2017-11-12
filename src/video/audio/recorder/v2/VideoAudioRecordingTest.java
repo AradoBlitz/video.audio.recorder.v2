@@ -58,9 +58,9 @@ public class VideoAudioRecordingTest {
 		video.play(new AudioPlayer(){
 
 			@Override
-			public void play(Long timeSlot) {
+			public void play(long timeBorder) {
 				// TODO Auto-generated method stub
-				assertTrue(timeSlot!=0);
+				assertTrue(timeBorder!=0);
 			}
 			
 		});
