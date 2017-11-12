@@ -9,17 +9,15 @@ import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import com.github.sarxos.webcam.WebcamResolution;
+import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
+
 import video.audio.recorder.v2.video.Screen;
 
-public class VideoPlayerRecorder {
+public class VideoPlayerRecorder extends VideoRecorder {
 
 	private final int frameCount;
 
-	private Webcam webcam = Webcam.getDefault();
-
-	public List<BufferedImage> video = new ArrayList<>();
-
-	private List<Long> time = new ArrayList<>(); 
+	 
 
 	public VideoPlayerRecorder() {
 		this(1000);
@@ -28,33 +26,7 @@ public class VideoPlayerRecorder {
 	public VideoPlayerRecorder(int frameCount) {
 
 		this.frameCount = frameCount;
-		webcam.setViewSize(WebcamResolution.VGA.getSize());
-		WebcamListener camListener = new WebcamListener() {
-
-			@Override
-			public void webcamOpen(WebcamEvent arg0) {
-				// TODO Auto-generated method stub
-				System.out.println(arg0.toString() + "webcamOpen");
-			}
-
-			@Override
-			public void webcamImageObtained(WebcamEvent arg0) {
-
-			}
-
-			@Override
-			public void webcamDisposed(WebcamEvent arg0) {
-				// TODO Auto-generated method stub
-				System.out.println(arg0.toString() + "webcamDisposed");
-			}
-
-			@Override
-			public void webcamClosed(WebcamEvent arg0) {
-				// TODO Auto-generated method stub
-				System.out.println(arg0.toString() + "wbcamClosed");
-			}
-		};
-		webcam.addWebcamListener(camListener);
+		
 	}
 	
 	public void play(AudioPlayer audioRecorder) {
@@ -64,10 +36,11 @@ public class VideoPlayerRecorder {
 			long startTime = System.currentTimeMillis();
 			int counter = 0;
 			
-			for (int i = 0; i<video.size();i++) {
-				screen.setImage(video.get(i));
+			BufferedImage image;
+			for (int i = 0; (image=getImage(i))!=null;i++) {
+				screen.setImage(image);
 				counter += 1;
-				audioRecorder.play(i+1<time.size()?time.get(i+1):i);
+				audioRecorder.play(0!=getTime(i+1)?getTime(i+1):getTime(i));
 			}
 			System.out.println("Frames " + counter + " was played in "
 					+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
@@ -77,27 +50,11 @@ public class VideoPlayerRecorder {
 
 	}
 
+
 	public void record() {
 		for (int i = 0; i < frameCount; i++) {
-			BufferedImage image = webcam.getImage();
-			synchronized (this) {
-				video.add(image);
-				time.add(System.currentTimeMillis());
-			}
-		}
-		System.out.println("Recorded frames: " + video.size());
-	}
-
-	public void activateCam() {
-		webcam.open();
-	}
-
-	public void deactivateCam() {
-		webcam.close();
-	}
-
-	public void clearBuffer() {
-		video.clear();
+			super.record();
+		}		
 	}
 
 }
