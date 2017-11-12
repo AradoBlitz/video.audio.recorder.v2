@@ -8,7 +8,8 @@ import parallel.processing.sample.StartFlag;
 
 public class VideoAudioRecordingTest {
 
-	private AudioPlayer audio = new AudioPlayer(2000);
+	private AudioRecorder audioSource = new AudioRecorder();
+	private AudioPlayer audio = new AudioPlayer(audioSource);
 	private VideoRecorder video = new VideoRecorder(110);
 	private StartFlag startFlag = new StartFlag();
 	
@@ -33,7 +34,7 @@ public class VideoAudioRecordingTest {
 
 			try {
 				startFlag.syncLine();
-				audio.record();
+				audioSource.record();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -46,7 +47,7 @@ public class VideoAudioRecordingTest {
 	@Test
 	public void captureAudio() throws Exception {
 
-		audio.record();
+		audioSource.record();
 		audio.play(System.currentTimeMillis());
 		
 	}
@@ -55,7 +56,7 @@ public class VideoAudioRecordingTest {
 	public void captureVideo() throws Exception {
 
 		video.record();
-		video.play(new AudioPlayer(){
+		video.play(new AudioPlayer(null){
 
 			@Override
 			public void play(long timeBorder) {

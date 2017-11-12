@@ -5,8 +5,10 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.SourceDataLine;
 
-public class AudioPlayer extends AudioRecorder {
+public class AudioPlayer {
 
+	
+	private final AudioRecorder source;
 	
 	int soundItem = 0;
 
@@ -18,11 +20,10 @@ public class AudioPlayer extends AudioRecorder {
 	
 	private SourceDataLine sourceLine;
 
-
-
-	public AudioPlayer(int frameCount) {
+	
+	public AudioPlayer(AudioRecorder source) {
 		
-		
+		this.source = source;
 		try {
 
 			sourceLine = (SourceDataLine) AudioSystem.getLine(sourceInfo);
@@ -33,18 +34,13 @@ public class AudioPlayer extends AudioRecorder {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public AudioPlayer() {
-		
-		this(1000);
-	}
 
 	
 
 	public void play(long timeBorder) {
 		System.out.println("Play audio");
 		byte[] audio;
-		while(timeBorder>getTime(soundItem)&&(audio=getAudiouData(soundItem))!=null){			
+		while(timeBorder>source.getTime(soundItem)&&(audio=source.getAudiouData(soundItem))!=null){			
 			sourceLine.write(audio, 0, audio.length);
 			soundItem+=1;
 		}		
