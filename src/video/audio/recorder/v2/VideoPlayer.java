@@ -13,17 +13,17 @@ import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
 
 import video.audio.recorder.v2.video.Screen;
 
-public class VideoPlayerRecorder extends VideoRecorder {
+public class VideoPlayer extends VideoRecorder {
 
 	private final int frameCount;
 
 	 
 
-	public VideoPlayerRecorder() {
+	public VideoPlayer() {
 		this(1000);
 	}
 
-	public VideoPlayerRecorder(int frameCount) {
+	public VideoPlayer(int frameCount) {
 
 		this.frameCount = frameCount;
 		
