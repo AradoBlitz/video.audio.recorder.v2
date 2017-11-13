@@ -13,7 +13,7 @@ import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
 
 import video.audio.recorder.v2.video.Screen;
 
-public class VideoPlayer extends VideoRecorder {
+public class VideoPlayer {
 
 	private final VideoRecorder source;	 
 

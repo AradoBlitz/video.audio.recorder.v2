@@ -24,7 +24,7 @@ public class VideoAudioRecordingTest {
 				System.out.println("Go!");//help to know to start counting.
 				video.record(110);
 			} finally {
-				video.deactivateCam();
+				videoSource.deactivateCam();
 			}
 		}
 	};
@@ -72,7 +72,7 @@ public class VideoAudioRecordingTest {
 
 	@Test
 	public void captureAudioAndVideo() throws Exception {
-		video.activateCam();
+		videoSource.activateCam();
 		videoStreamRecorder.start();
 		audioStreamRecorder.start();
 
