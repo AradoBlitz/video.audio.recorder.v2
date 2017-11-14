@@ -2,9 +2,9 @@ package video.audio.recorder.v2;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
-import parallel.processing.sample.StartFlag;
 
 public class VideoAudioRecordingTest {
 
@@ -19,12 +19,9 @@ public class VideoAudioRecordingTest {
 		@Override
 		public void run() {
 			
-			try {
-				System.out.println("Go!");//help to know to start counting.
-				video.record(110);
-			} finally {
-				videoSource.deactivateCam();
-			}
+			System.out.println("Go!");//help to know to start counting.
+			video.record(110);
+			
 		}
 	};
 
@@ -67,10 +64,15 @@ public class VideoAudioRecordingTest {
 		});
 		
 	}
+	
+	@Before
+	public void startCam() throws Exception {
+		videoSource.activateCam();
+	}
 
 	@Test
 	public void captureAudioAndVideo() throws Exception {
-		videoSource.activateCam();
+	
 		videoStreamRecorder.start();
 		audioStreamRecorder.start();
 
@@ -79,5 +81,10 @@ public class VideoAudioRecordingTest {
 		
 		video.play(audio);
 
+	}
+	
+	@After
+	public void stopCam() throws Exception{
+		videoSource.deactivateCam();
 	}
 }
