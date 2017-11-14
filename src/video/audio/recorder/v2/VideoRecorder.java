@@ -50,10 +50,8 @@ public class VideoRecorder {
 	public void record() {
 
 		BufferedImage image = webcam.getImage();
-		synchronized (this) {
-			video.add(image);
-			time.add(System.currentTimeMillis());
-		}
+		video.add(image);
+		time.add(System.currentTimeMillis());
 
 		System.out.println("Recorded frames: " + video.size());
 	}

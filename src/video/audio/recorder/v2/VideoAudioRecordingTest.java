@@ -13,14 +13,13 @@ public class VideoAudioRecordingTest {
 	
 	private VideoRecorder videoSource = new VideoRecorder();
 	private VideoPlayer video = new VideoPlayer(videoSource);
-	private StartFlag startFlag = new StartFlag();
+	
 	
 	private Thread videoStreamRecorder = new Thread("videoRecorder") {
 		@Override
 		public void run() {
 			
 			try {
-				startFlag.syncLine();
 				System.out.println("Go!");//help to know to start counting.
 				video.record(110);
 			} finally {
@@ -35,7 +34,6 @@ public class VideoAudioRecordingTest {
 		public void run() {
 
 			try {
-				startFlag.syncLine();
 				audioSource.record();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
