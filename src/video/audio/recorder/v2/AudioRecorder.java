@@ -72,9 +72,11 @@ public class AudioRecorder {
 		
 		TimeUnit.SECONDS.sleep(10);
 		
+		int counter = 0;
 		for(int i =0;i<frameCount;i++){
-			time.add(rBuff[i].time);
-			audioCollector.add(rBuff[i].data);
+			time.add(rBuff[counter].time);
+			audioCollector.add(rBuff[counter].data);
+			counter++;
 		}
 
 		
