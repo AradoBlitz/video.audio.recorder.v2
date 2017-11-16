@@ -34,9 +34,9 @@ public class AudioRecorder {
 	
 
 
-	private volatile AudioItem[] rBuff = new AudioItem[frameCount];
+	private volatile AudioItem[] rBuff = new AudioItem[frameCount*2];
 
-	private int buffIndex;
+	private volatile int buffIndex;
 	{
 		for(int i = 0; i<rBuff.length;i++)
 			rBuff[i]=new AudioItem();
@@ -54,29 +54,42 @@ public class AudioRecorder {
 			
 			@Override
 				public void run() {
-					
+					System.out.println("Audio Start");
 				byte[] buff = new byte[1024];
 				int count = 0;		
-				for(int i = 0;i<frameCount;i++){
+				for(int i = 0;i<frameCount*2;i++){
 					count = targetLine.read(buff, 0, buff.length);
 					rBuff[buffIndex].time=System.currentTimeMillis();		
 					ByteArrayOutputStream convertor = new ByteArrayOutputStream();
 					convertor.write(buff, 0, count);
 					rBuff[buffIndex].data=convertor.toByteArray();
 					
-					buffIndex++;
+						buffIndex++;
+						
+					if(buffIndex>=rBuff.length){
+						buffIndex=0;
+					}
 			
+					System.out.println("buffIndex: " + buffIndex);
 				}
 			}
 		}.start();
 		
-		TimeUnit.SECONDS.sleep(10);
+		TimeUnit.SECONDS.sleep(15);
 		
-		int counter = 0;
-		for(int i =0;i<frameCount;i++){
-			time.add(rBuff[counter].time);
-			audioCollector.add(rBuff[counter].data);
-			counter++;
+		int counter = buffIndex;
+		if(counter>=frameCount){
+			counter=0;
+		}
+		for(int i =0;i<frameCount*2;i++){
+			
+				time.add(rBuff[counter].time);
+				audioCollector.add(rBuff[counter].data);		
+				counter++;
+			if(counter>=rBuff.length){
+				counter=0;
+			}
+			System.out.println("counter: " + counter);
 		}
 
 		
