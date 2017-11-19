@@ -34,7 +34,7 @@ public class AudioRecorder {
 	
 
 
-	private volatile AudioItem[] rBuff = new AudioItem[500];
+	private volatile AudioItem[] rBuff = new AudioItem[frameCount];
 
 	private volatile int buffIndex;
 	{
@@ -85,15 +85,8 @@ public class AudioRecorder {
 			//	System.out.println("Thread Collector run");
 				int counter = buffIndex;
 
-				for(int i =0;i<frameCount*2;){
-					
-					while(counter!=buffIndex){
-							time.add(rBuff[counter].time);
-							audioCollector.add(rBuff[counter].data);		
-							counter++;
-							if(counter>=rBuff.length)
-								counter = 0;
-					}
+				for(int i =0;i<frameCount*2;){					
+					counter = readAudioData(counter,time,audioCollector);
 					System.out.println("counter: " + counter);
 				}
 			}
@@ -116,5 +109,16 @@ public class AudioRecorder {
 		if(soundItem<time.size())
 			return time.get(soundItem);
 		return 0;
+	}
+
+	private int readAudioData(int counter,List<Long> time, List<byte[]> audioCollector) {
+		while(counter!=buffIndex){
+				time.add(rBuff[counter].time);
+				audioCollector.add(rBuff[counter].data);		
+				counter++;
+				if(counter>=rBuff.length)
+					counter = 0;
+		}
+		return counter;
 	}
 }
