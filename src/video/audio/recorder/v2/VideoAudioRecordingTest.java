@@ -2,6 +2,8 @@ package video.audio.recorder.v2;
 
 import static org.junit.Assert.*;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +47,7 @@ public class VideoAudioRecordingTest {
 	public void captureAudio() throws Exception {
 
 		audioSource.record();
+		TimeUnit.SECONDS.sleep(15);
 		audio.play(System.currentTimeMillis());
 		
 	}
