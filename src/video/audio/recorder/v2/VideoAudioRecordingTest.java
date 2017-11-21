@@ -33,7 +33,9 @@ public class VideoAudioRecordingTest {
 		public void run() {
 
 			try {
+				System.out.println("Start audio recording");
 				audioSource.record();
+				System.out.println("Stop audio recording");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -45,9 +47,9 @@ public class VideoAudioRecordingTest {
 	
 	@Test
 	public void captureAudio() throws Exception {
-
+	
 		audioSource.record();
-		TimeUnit.SECONDS.sleep(15);
+	
 		audio.play(System.currentTimeMillis());
 		
 	}
@@ -71,6 +73,16 @@ public class VideoAudioRecordingTest {
 	@Before
 	public void startCam() throws Exception {
 		videoSource.activateCam();
+		new Thread(){
+			
+			@Override
+				public void run() {
+				audioSource.startAudioRecording();
+				
+				
+			}
+		}.start();
+		
 	}
 
 	@Test
@@ -89,5 +101,6 @@ public class VideoAudioRecordingTest {
 	@After
 	public void stopCam() throws Exception{
 		videoSource.deactivateCam();
+		audioSource.isRecording = false;
 	}
 }
