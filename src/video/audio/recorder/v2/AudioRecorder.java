@@ -50,48 +50,19 @@ public class AudioRecorder {
 	}
 	
 	public void record() throws Exception{
-		new Thread(){
-			
-			@Override
-				public void run() {
-					System.out.println("Audio Start");
-				byte[] buff = new byte[1024];
-				int count = 0;		
-				for(int i = 0;i<frameCount*3;i++){
-					count = targetLine.read(buff, 0, buff.length);
-					rBuff[buffIndex].time=System.currentTimeMillis();		
-					ByteArrayOutputStream convertor = new ByteArrayOutputStream();
-					convertor.write(buff, 0, count);
-					rBuff[buffIndex].data=convertor.toByteArray();
-					
-						buffIndex++;
-						
-					if(buffIndex>=rBuff.length){
-						buffIndex=0;
-					}
-			
-					System.out.println("buffIndex: " + buffIndex);
-				}
-				
-				
-			}
-		}.start();
 		
 		
-		new Thread(){
-
-			@Override
-			public void run() {
+		
+	
 			//	System.out.println("Thread Collector run");
 				int counter = buffIndex;
 
-				for(int i =0;i<frameCount*2;){					
+				for(int i =0;i<frameCount*frameCount;i++){					
 					counter = readAudioData(counter,time,audioCollector);
 					System.out.println("counter: " + counter);
 				}
-			}
 			
-		}.start();
+			
 		
 
 		
@@ -120,5 +91,27 @@ public class AudioRecorder {
 					counter = 0;
 		}
 		return counter;
+	}
+
+	public volatile boolean isRecording = true;
+	
+	public void startAudioRecording() {
+		System.out.println("Audio Start");
+		byte[] buff = new byte[1024];
+		int count = 0;		
+		while(isRecording){
+			count = targetLine.read(buff, 0, buff.length);
+			rBuff[buffIndex].time=System.currentTimeMillis();		
+			ByteArrayOutputStream convertor = new ByteArrayOutputStream();
+			convertor.write(buff, 0, count);
+			rBuff[buffIndex].data=convertor.toByteArray();
+			
+			buffIndex++;				
+			if(buffIndex==rBuff.length){
+				buffIndex=0;
+			}
+
+			System.out.println("buffIndex: " + buffIndex);
+		}
 	}
 }
