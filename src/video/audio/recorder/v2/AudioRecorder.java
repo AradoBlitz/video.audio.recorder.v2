@@ -116,7 +116,7 @@ public class AudioRecorder {
 				time.add(rBuff[counter].time);
 				audioCollector.add(rBuff[counter].data);		
 				counter++;
-				if(counter>=rBuff.length)
+				if(counter==rBuff.length)
 					counter = 0;
 		}
 		return counter;
