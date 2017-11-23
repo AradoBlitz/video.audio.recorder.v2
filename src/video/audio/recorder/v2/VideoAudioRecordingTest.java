@@ -2,6 +2,7 @@ package video.audio.recorder.v2;
 
 import static org.junit.Assert.*;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -20,10 +21,10 @@ public class VideoAudioRecordingTest {
 	private Thread videoStreamRecorder = new Thread("videoRecorder") {
 		@Override
 		public void run() {
-			
+			System.out.println("Start video recording");
 			System.out.println("Go!");//help to know to start counting.
-			video.record(110);
-			
+			video.record(1110);
+			System.out.println("Stop video recording");
 		}
 	};
 
@@ -63,7 +64,12 @@ public class VideoAudioRecordingTest {
 			@Override
 			public void play(long timeBorder) {
 				// TODO Auto-generated method stub
-				assertTrue(timeBorder!=0);
+				try {
+					TimeUnit.MILLISECONDS.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 		});
@@ -77,7 +83,16 @@ public class VideoAudioRecordingTest {
 			
 			@Override
 				public void run() {
+				videoSource.activateCam();
+				videoSource.startVideoRecording();
+			}
+		}.start();
+		new Thread(){
+			
+			@Override
+				public void run() {
 				audioSource.startAudioRecording();
+				
 				
 				
 			}

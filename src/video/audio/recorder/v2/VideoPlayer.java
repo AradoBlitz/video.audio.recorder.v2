@@ -44,9 +44,9 @@ public class VideoPlayer {
 
 
 	public void record(int frameCount) {
-		for (int i = 0; i < frameCount; i++) {
-			source.record();
-		}		
+	
+			source.record(frameCount);
+			
 	}
 
 }
