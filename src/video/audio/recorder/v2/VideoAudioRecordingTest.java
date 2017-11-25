@@ -59,15 +59,8 @@ public class VideoAudioRecordingTest {
 	
 	@Before
 	public void startCam() throws Exception {
-		videoSource.activateCam();
-		new Thread(){
-			
-			@Override
-				public void run() {
-				videoSource.activateCam();
-				videoSource.cameraOn();
-			}
-		}.start();
+					
+		videoSource.cameraOn();
 		
 		audioSource.micOn();
 	
@@ -88,7 +81,8 @@ public class VideoAudioRecordingTest {
 	
 	@After
 	public void stopCam() throws Exception{
-		videoSource.deactivateCam();
+		
+		videoSource.cameraOff();
 		audioSource.micOff();
 	}
 }

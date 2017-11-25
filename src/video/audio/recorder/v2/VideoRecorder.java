@@ -100,18 +100,32 @@ public class VideoRecorder {
 	}
 	
 	public void cameraOn() {
-		System.out.println("Audio Start");		
-		while(isActive){
-			BufferedImage image = webcam.getImage();
-			rBuff[currentBufferIndex()].time=System.currentTimeMillis();		
-			rBuff[currentBufferIndex()].data=image;
-			
-			buffIndex++;				
-			if(currentBufferIndex()==rBuff.length){
-				buffIndex=0;
-			}
 
-			System.out.println("Video buffIndex: " + buffIndex);
-		}
+		activateCam();
+		new Thread() {
+
+			@Override
+			public void run() {
+				System.out.println("Video Start");
+				while (isActive) {
+					BufferedImage image = webcam.getImage();
+					rBuff[currentBufferIndex()].time = System.currentTimeMillis();
+					rBuff[currentBufferIndex()].data = image;
+
+					buffIndex++;
+					if (currentBufferIndex() == rBuff.length) {
+						buffIndex = 0;
+					}
+
+					System.out.println("Video buffIndex: " + buffIndex);
+				}
+			}
+		}.start();
+	}
+
+	public void cameraOff() {
+		isActive=false;
+		deactivateCam();
+		
 	}
 }
