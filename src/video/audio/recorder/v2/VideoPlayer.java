@@ -17,6 +17,8 @@ public class VideoPlayer {
 
 	private final VideoRecorder source;
 	
+	private volatile boolean isRecording = false;
+	
 	private List<BufferedImage> video = new ArrayList<>();
 
 	private List<Long> time = new ArrayList<>();
@@ -47,16 +49,31 @@ public class VideoPlayer {
 	}
 
 
-	public void record(int frameCount) {
-		
-		int counter = source.currentBufferIndex();
+	public void record() {
+		isRecording=true;
+		new Thread(){
 
-		for(int i =0;i<frameCount*frameCount;i++){					
-			counter = source.readAudioData(counter,time,video);
-			System.out.println("Video counter: " + counter);
-		}
+			@Override
+			public void run() {
+				System.out.println("Start video recording");
+				System.out.println("Go!");//help to know to start counting.
+				
+				int counter = source.currentBufferIndex();
 
-		System.out.println("Recorded images: " + video.size());
+				while(isRecording){					
+					counter = source.readAudioData(counter,time,video);
+					System.out.println("Video counter: " + counter);
+				}
+				
+				System.out.println("Stop video recording");
+				System.out.println("Recorded images: " + video.size());
+			}
+			
+		}.start();		
+	}
+	
+	public void stop(){
+		isRecording = false;
 	}
 
 	public BufferedImage getImage(int i) {

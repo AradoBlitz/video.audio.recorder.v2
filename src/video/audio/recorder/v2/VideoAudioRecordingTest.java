@@ -13,17 +13,6 @@ public class VideoAudioRecordingTest {
 	
 	private VideoRecorder videoSource = new VideoRecorder();
 	private VideoPlayer video = new VideoPlayer(videoSource);
-	
-	
-	private Thread videoStreamRecorder = new Thread("videoRecorder") {
-		@Override
-		public void run() {
-			System.out.println("Start video recording");
-			System.out.println("Go!");//help to know to start counting.
-			video.record(1110);
-			System.out.println("Stop video recording");
-		}
-	};
 
 	
 	@Test
@@ -39,7 +28,9 @@ public class VideoAudioRecordingTest {
 	@Test
 	public void captureVideo() throws Exception {
 
-		video.record(110);
+		video.record();
+		TimeUnit.SECONDS.sleep(15);
+		video.stop();
 		video.play(new AudioPlayer(null){
 
 			@Override
@@ -70,9 +61,10 @@ public class VideoAudioRecordingTest {
 	@Test
 	public void captureAudioAndVideo() throws Exception {
 	
-		videoStreamRecorder.start();
+		video.record();
 		audio.record();
-		videoStreamRecorder.join();
+		TimeUnit.SECONDS.sleep(25);
+		video.stop();
 		audio.stop();
 		
 		video.play(audio);
