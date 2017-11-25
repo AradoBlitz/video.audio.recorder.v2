@@ -65,7 +65,7 @@ public class VideoAudioRecordingTest {
 			@Override
 				public void run() {
 				videoSource.activateCam();
-				videoSource.camOn();
+				videoSource.cameraOn();
 			}
 		}.start();
 		

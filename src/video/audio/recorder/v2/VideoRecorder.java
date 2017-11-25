@@ -18,13 +18,9 @@ public class VideoRecorder {
 	
 	public volatile boolean isActive = true;
 	
-	private volatile VideoItem[] rBuff = new VideoItem[1000];
+	private volatile VideoItem[] rBuff;
 
-	private volatile int buffIndex;
-	{
-		for(int i = 0; i<rBuff.length;i++)
-			rBuff[i]=new VideoItem();
-	}
+	private volatile int buffIndex;	
 	
 	private static class VideoItem{
 
@@ -32,8 +28,13 @@ public class VideoRecorder {
 		public BufferedImage data;
 		
 	}
+	
+	public VideoRecorder(){
+		this(1000);
+	}
 
-	public VideoRecorder() {
+	public VideoRecorder(int bufferSize) {
+		initBuffer(bufferSize);
 		webcam.setViewSize(WebcamResolution.VGA.getSize());
 		WebcamListener camListener = new WebcamListener() {
 
@@ -65,6 +66,16 @@ public class VideoRecorder {
 
 
 
+	private void initBuffer(int bufferSize) {
+		rBuff = new VideoItem[bufferSize];
+		{
+			for(int i = 0; i<rBuff.length;i++)
+				rBuff[i]=new VideoItem();
+		}		
+	}
+
+
+
 	public int currentBufferIndex() {
 		return buffIndex;
 	}
@@ -88,7 +99,7 @@ public class VideoRecorder {
 		return counter;
 	}
 	
-	public void camOn() {
+	public void cameraOn() {
 		System.out.println("Audio Start");		
 		while(isActive){
 			BufferedImage image = webcam.getImage();
