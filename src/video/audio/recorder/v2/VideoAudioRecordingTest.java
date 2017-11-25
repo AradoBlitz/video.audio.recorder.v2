@@ -31,20 +31,7 @@ public class VideoAudioRecordingTest {
 		video.record();
 		TimeUnit.SECONDS.sleep(15);
 		video.stop();
-		video.play(new AudioPlayer(null){
-
-			@Override
-			public void play(long timeBorder) {
-				// TODO Auto-generated method stub
-				try {
-					TimeUnit.MILLISECONDS.sleep(500);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			
-		});
+		video.play();
 		
 	}
 	
