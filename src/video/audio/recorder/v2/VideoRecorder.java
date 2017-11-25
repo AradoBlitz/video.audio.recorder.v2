@@ -16,7 +16,7 @@ public class VideoRecorder {
 
 	private Webcam webcam = Webcam.getDefault();
 	
-	public volatile boolean isActive = true;
+	private volatile boolean isActive = true;
 	
 	private volatile VideoItem[] rBuff;
 
