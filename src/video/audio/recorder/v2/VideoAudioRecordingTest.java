@@ -84,16 +84,9 @@ public class VideoAudioRecordingTest {
 				videoSource.startVideoRecording();
 			}
 		}.start();
-		new Thread(){
-			
-			@Override
-				public void run() {
-				audioSource.micOn();
-				
-				
-				
-			}
-		}.start();
+		
+		audioSource.micOn();
+	
 		
 	}
 

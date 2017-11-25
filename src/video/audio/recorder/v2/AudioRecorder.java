@@ -14,7 +14,7 @@ public class AudioRecorder {
 	private AudioFormat format = new AudioFormat(44100, 16, 2, true, true);
 	private DataLine.Info targetInfo = new DataLine.Info(TargetDataLine.class, format);
 
-	private int buffIndex;
+	private volatile int buffIndex;
 	private volatile boolean isRecording = true;
 
 	private volatile AudioItem[] rBuff;
@@ -68,24 +68,32 @@ public class AudioRecorder {
 	}
 
 	public void micOn() {
-		System.out.println("Audio Start");
-		byte[] buff = new byte[1024];
-		int count = 0;
-		isRecording = true;
-		while (isRecording) {
-			count = targetLine.read(buff, 0, buff.length);
-			rBuff[currentBufferIndex()].time = System.currentTimeMillis();
-			ByteArrayOutputStream convertor = new ByteArrayOutputStream();
-			convertor.write(buff, 0, count);
-			rBuff[currentBufferIndex()].data = convertor.toByteArray();
 
-			buffIndex++;
-			if (currentBufferIndex() == rBuff.length) {
-				buffIndex = 0;
+		new Thread() {
+
+			@Override
+			public void run() {
+				System.out.println("Audio Start");
+				byte[] buff = new byte[1024];
+				int count = 0;
+				isRecording = true;
+				while (isRecording) {
+					count = targetLine.read(buff, 0, buff.length);
+					rBuff[currentBufferIndex()].time = System.currentTimeMillis();
+					ByteArrayOutputStream convertor = new ByteArrayOutputStream();
+					convertor.write(buff, 0, count);
+					rBuff[currentBufferIndex()].data = convertor.toByteArray();
+
+					buffIndex++;
+					if (currentBufferIndex() == rBuff.length) {
+						buffIndex = 0;
+					}
+
+					System.out.println("buffIndex: " + buffIndex);
+				}
+
 			}
-
-			System.out.println("buffIndex: " + buffIndex);
-		}
+		}.start();
 	}
 
 	public void micOff() {
