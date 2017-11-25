@@ -1,5 +1,8 @@
 package video.audio.recorder.v2;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
@@ -19,6 +22,11 @@ public class AudioPlayer {
 
 	
 	private SourceDataLine sourceLine;
+	
+	private final int frameCount = 1000;
+	
+	List<Long> time = new ArrayList<>();
+	private List<byte[]> audioCollector = new ArrayList<>();
 
 	
 	public AudioPlayer(AudioRecorder source) {
@@ -40,9 +48,34 @@ public class AudioPlayer {
 	public void play(long timeBorder) {
 		System.out.println("Play audio");
 		byte[] audio;
-		while(timeBorder>source.getTime(soundItem)&&(audio=source.getAudiouData(soundItem))!=null){			
+		while(timeBorder>getTime(soundItem)&&(audio=getAudiouData(soundItem))!=null){			
 			sourceLine.write(audio, 0, audio.length);
 			soundItem+=1;
 		}		
+	}
+	
+	public void record() throws Exception {	
+		
+		
+		//	System.out.println("Thread Collector run");
+			int counter = source.currentBufferIndex();
+
+			for(int i =0;i<frameCount*frameCount;i++){					
+				counter = source.readAudioData(counter,time,audioCollector);
+				System.out.println("counter: " + counter);
+			}
+			System.out.println("End audio recording. Collected " + audioCollector + "bytes.");
+	}
+	
+	public byte[] getAudiouData(int soundItem) {
+		if(soundItem<audioCollector.size())
+			return audioCollector.get(soundItem);
+		return null;
+	}
+
+	public long getTime(int soundItem) {
+		if(soundItem<time.size())
+			return time.get(soundItem);
+		return 0;
 	}
 }

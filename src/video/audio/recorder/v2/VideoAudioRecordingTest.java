@@ -1,8 +1,5 @@
 package video.audio.recorder.v2;
 
-import static org.junit.Assert.*;
-
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -35,7 +32,7 @@ public class VideoAudioRecordingTest {
 
 			try {
 				System.out.println("Start audio recording");
-				audioSource.record();
+				audio.record();
 				System.out.println("Stop audio recording");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -49,7 +46,7 @@ public class VideoAudioRecordingTest {
 	@Test
 	public void captureAudio() throws Exception {
 	
-		audioSource.record();
+		audio.record();
 	
 		audio.play(System.currentTimeMillis());
 		
