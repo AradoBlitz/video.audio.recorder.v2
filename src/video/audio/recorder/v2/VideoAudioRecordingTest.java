@@ -25,29 +25,13 @@ public class VideoAudioRecordingTest {
 		}
 	};
 
-	private Thread audioStreamRecorder =  new Thread("audioRecorder") {
-
-		@Override
-		public void run() {
-
-			try {
-				System.out.println("Start audio recording");
-				audio.record();
-				System.out.println("Stop audio recording");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-	};
-
 	
 	@Test
 	public void captureAudio() throws Exception {
 	
 		audio.record();
-	
+		TimeUnit.SECONDS.sleep(15);
+		audio.stop();
 		audio.play(System.currentTimeMillis());
 		
 	}
@@ -94,10 +78,9 @@ public class VideoAudioRecordingTest {
 	public void captureAudioAndVideo() throws Exception {
 	
 		videoStreamRecorder.start();
-		audioStreamRecorder.start();
-
+		audio.record();
 		videoStreamRecorder.join();
-		audioStreamRecorder.join();
+		audio.stop();
 		
 		video.play(audio);
 

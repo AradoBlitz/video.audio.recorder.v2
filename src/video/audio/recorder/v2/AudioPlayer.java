@@ -20,10 +20,9 @@ public class AudioPlayer {
 	
 	private DataLine.Info sourceInfo = new DataLine.Info(SourceDataLine.class, format);
 
+	private volatile boolean isRecording;
 	
 	private SourceDataLine sourceLine;
-	
-	private final int frameCount = 1000;
 	
 	List<Long> time = new ArrayList<>();
 	private List<byte[]> audioCollector = new ArrayList<>();
@@ -56,15 +55,25 @@ public class AudioPlayer {
 	
 	public void record() throws Exception {	
 		
-		
-		//	System.out.println("Thread Collector run");
-			int counter = source.currentBufferIndex();
+		new Thread(){
 
-			for(int i =0;i<frameCount*frameCount;i++){					
-				counter = source.readAudioData(counter,time,audioCollector);
-				System.out.println("counter: " + counter);
+			public void run(){
+				System.out.println("Start audio recording");
+				int counter = source.currentBufferIndex();
+				isRecording=true;
+				while(isRecording){					
+					counter = source.readAudioData(counter,time,audioCollector);
+					System.out.println("counter: " + counter);
+				}
+				System.out.println("Stop audio recording");
+				System.out.println("End audio recording. Collected " + audioCollector + "bytes.");
+				
 			}
-			System.out.println("End audio recording. Collected " + audioCollector + "bytes.");
+		}.start();
+	}
+	
+	public void stop(){
+		isRecording=false;
 	}
 	
 	public byte[] getAudiouData(int soundItem) {
