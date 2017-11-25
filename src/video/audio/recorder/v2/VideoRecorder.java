@@ -15,10 +15,23 @@ import com.github.sarxos.webcam.WebcamResolution;
 public class VideoRecorder {
 
 	private Webcam webcam = Webcam.getDefault();
+	
+	public volatile boolean isActive = true;
+	
+	private volatile VideoItem[] rBuff = new VideoItem[1000];
 
-	private List<BufferedImage> video = new ArrayList<>();
+	private volatile int buffIndex;
+	{
+		for(int i = 0; i<rBuff.length;i++)
+			rBuff[i]=new VideoItem();
+	}
+	
+	private static class VideoItem{
 
-	private List<Long> time = new ArrayList<>();
+		public long time;
+		public BufferedImage data;
+		
+	}
 
 	public VideoRecorder() {
 		webcam.setViewSize(WebcamResolution.VGA.getSize());
@@ -50,20 +63,10 @@ public class VideoRecorder {
 		webcam.addWebcamListener(camListener);
 	}
 
-	public void record(int frameCount) {
 
-		/*BufferedImage image = webcam.getImage();
-		video.add(image);
-		time.add(System.currentTimeMillis());*/
-		
-		int counter = buffIndex;
 
-		for(int i =0;i<frameCount*frameCount;i++){					
-			counter = readAudioData(counter,time,video);
-			System.out.println("Video counter: " + counter);
-		}
-
-		System.out.println("Recorded images: " + video.size());
+	public int currentBufferIndex() {
+		return buffIndex;
 	}
 
 	public void activateCam() {
@@ -73,40 +76,9 @@ public class VideoRecorder {
 	public void deactivateCam() {
 		webcam.close();
 	}
-
-	public void clearBuffer() {
-		video.clear();
-	}
 	
-	public BufferedImage getImage(int i) {
-		if(i<video.size())
-			return video.get(i);
-		return null;
-	}
-	
-	public long getTime(int i) {
-		if(i<time.size())
-			return time.get(i);
-		return 0;
-	}
-	
-	private volatile VideoItem[] rBuff = new VideoItem[1000];
-
-	private volatile int buffIndex;
-	{
-		for(int i = 0; i<rBuff.length;i++)
-			rBuff[i]=new VideoItem();
-	}
-	
-	private static class VideoItem{
-
-		public long time;
-		public BufferedImage data;
-		
-	}
-	
-	private int readAudioData(int counter,List<Long> time, List<BufferedImage> videoCollector) {
-		while(counter!=buffIndex){
+	public int readAudioData(int counter,List<Long> time, List<BufferedImage> videoCollector) {
+		while(counter!=currentBufferIndex()){
 				time.add(rBuff[counter].time);
 				videoCollector.add(rBuff[counter].data);		
 				counter++;
@@ -115,18 +87,16 @@ public class VideoRecorder {
 		}
 		return counter;
 	}
-
-	public volatile boolean isRecording = true;
 	
-	public void startVideoRecording() {
+	public void camOn() {
 		System.out.println("Audio Start");		
-		while(isRecording){
+		while(isActive){
 			BufferedImage image = webcam.getImage();
-			rBuff[buffIndex].time=System.currentTimeMillis();		
-			rBuff[buffIndex].data=image;
+			rBuff[currentBufferIndex()].time=System.currentTimeMillis();		
+			rBuff[currentBufferIndex()].data=image;
 			
 			buffIndex++;				
-			if(buffIndex==rBuff.length){
+			if(currentBufferIndex()==rBuff.length){
 				buffIndex=0;
 			}
 

@@ -15,7 +15,11 @@ import video.audio.recorder.v2.video.Screen;
 
 public class VideoPlayer {
 
-	private final VideoRecorder source;	 
+	private final VideoRecorder source;
+	
+	private List<BufferedImage> video = new ArrayList<>();
+
+	private List<Long> time = new ArrayList<>();
 
 	public VideoPlayer(VideoRecorder source) {
 		this.source = source;		
@@ -29,10 +33,10 @@ public class VideoPlayer {
 			int counter = 0;
 			
 			BufferedImage image;
-			for (int i = 0; (image=source.getImage(i))!=null;i++) {
+			for (int i = 0; (image=getImage(i))!=null;i++) {
 				screen.setImage(image);
 				counter += 1;
-				audioRecorder.play(0!=source.getTime(i+1)?source.getTime(i+1):source.getTime(i));
+				audioRecorder.play(0!=getTime(i+1)?getTime(i+1):getTime(i));
 			}
 			System.out.println("Frames " + counter + " was played in "
 					+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
@@ -44,9 +48,26 @@ public class VideoPlayer {
 
 
 	public void record(int frameCount) {
-	
-			source.record(frameCount);
-			
+		
+		int counter = source.currentBufferIndex();
+
+		for(int i =0;i<frameCount*frameCount;i++){					
+			counter = source.readAudioData(counter,time,video);
+			System.out.println("Video counter: " + counter);
+		}
+
+		System.out.println("Recorded images: " + video.size());
 	}
 
+	public BufferedImage getImage(int i) {
+		if(i<video.size())
+			return video.get(i);
+		return null;
+	}
+	
+	public long getTime(int i) {
+		if(i<time.size())
+			return time.get(i);
+		return 0;
+	}
 }
