@@ -19,6 +19,7 @@ public class AudioRecorder {
 	List<Long> time = new ArrayList<>();
 	private List<byte[]> audioCollector = new ArrayList<>();
 	private final int frameCount = 1000;
+	private volatile boolean isRecording = true;
 
 	public AudioRecorder() {
 		try {
@@ -55,7 +56,7 @@ public class AudioRecorder {
 		
 	
 			//	System.out.println("Thread Collector run");
-				int counter = buffIndex;
+				int counter = currentBufferIndex();
 
 				for(int i =0;i<frameCount*frameCount;i++){					
 					counter = readAudioData(counter,time,audioCollector);
@@ -68,6 +69,10 @@ public class AudioRecorder {
 		
 
 		System.out.println("End audio recording. Collected " + audioCollector + "bytes.");
+	}
+
+	public int currentBufferIndex() {
+		return buffIndex;
 	}
 	
 	public byte[] getAudiouData(int soundItem) {
@@ -83,7 +88,7 @@ public class AudioRecorder {
 	}
 
 	private int readAudioData(int counter,List<Long> time, List<byte[]> audioCollector) {
-		while(counter!=buffIndex){
+		while(counter!=currentBufferIndex()){
 				time.add(rBuff[counter].time);
 				audioCollector.add(rBuff[counter].data);		
 				counter++;
@@ -93,25 +98,30 @@ public class AudioRecorder {
 		return counter;
 	}
 
-	public volatile boolean isRecording = true;
 	
-	public void startAudioRecording() {
+	
+	public void micOn() {
 		System.out.println("Audio Start");
 		byte[] buff = new byte[1024];
-		int count = 0;		
+		int count = 0;
+		isRecording = true;
 		while(isRecording){
 			count = targetLine.read(buff, 0, buff.length);
-			rBuff[buffIndex].time=System.currentTimeMillis();		
+			rBuff[currentBufferIndex()].time=System.currentTimeMillis();		
 			ByteArrayOutputStream convertor = new ByteArrayOutputStream();
 			convertor.write(buff, 0, count);
-			rBuff[buffIndex].data=convertor.toByteArray();
+			rBuff[currentBufferIndex()].data=convertor.toByteArray();
 			
 			buffIndex++;				
-			if(buffIndex==rBuff.length){
+			if(currentBufferIndex()==rBuff.length){
 				buffIndex=0;
 			}
 
 			System.out.println("buffIndex: " + buffIndex);
 		}
+	}
+
+	public void micOff() {
+		isRecording = false;		
 	}
 }

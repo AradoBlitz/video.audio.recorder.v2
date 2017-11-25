@@ -91,7 +91,7 @@ public class VideoAudioRecordingTest {
 			
 			@Override
 				public void run() {
-				audioSource.startAudioRecording();
+				audioSource.micOn();
 				
 				
 				
@@ -116,6 +116,6 @@ public class VideoAudioRecordingTest {
 	@After
 	public void stopCam() throws Exception{
 		videoSource.deactivateCam();
-		audioSource.isRecording = false;
+		audioSource.micOff();
 	}
 }
