@@ -1,4 +1,4 @@
-package video.audio.recorder.v2;
+package video.audio.recorder.v2.inmemory;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import com.github.sarxos.webcam.WebcamListener;
 import com.github.sarxos.webcam.WebcamResolution;
 import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
 
+import video.audio.recorder.v2.VideoRecorder;
 import video.audio.recorder.v2.video.Screen;
 
 public class VideoPlayer {

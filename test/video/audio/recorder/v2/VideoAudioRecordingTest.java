@@ -6,6 +6,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import video.audio.recorder.v2.inmemory.AudioPlayer;
+import video.audio.recorder.v2.inmemory.VideoPlayer;
+
 public class VideoAudioRecordingTest {
 
 	private AudioRecorder audioSource = new AudioRecorder();
