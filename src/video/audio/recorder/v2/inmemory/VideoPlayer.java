@@ -5,12 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamEvent;
-import com.github.sarxos.webcam.WebcamListener;
-import com.github.sarxos.webcam.WebcamResolution;
-import com.sun.corba.se.impl.orbutil.RepositoryIdUtility;
-
 import video.audio.recorder.v2.VideoRecorder;
 import video.audio.recorder.v2.video.Screen;
 
