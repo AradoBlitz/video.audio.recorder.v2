@@ -55,6 +55,22 @@ public class AudioPlayer {
 		}		
 	}
 	
+	public void play(VideoPlayer video) {
+		System.out.println("Play audio");
+		try{
+		video.openScreen();
+		byte[] audio;
+		while((audio=getAudiouData(soundItem))!=null){			
+			video.play(getTime(soundItem));
+			sourceLine.write(audio, 0, audio.length);
+			soundItem+=1;
+		}
+		}finally {
+			video.closeScreen();
+		}
+		
+	}
+	
 	public void record() throws Exception {	
 		
 		new Thread(){
@@ -89,4 +105,8 @@ public class AudioPlayer {
 			return time.get(soundItem);
 		return 0;
 	}
+
+
+
+	
 }
