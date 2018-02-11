@@ -1,6 +1,6 @@
 package video.audio.recorder.v2.tofile;
 
-import java.io.ByteArrayInputStream;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -19,15 +20,13 @@ import javax.sound.sampled.SourceDataLine;
 
 import org.junit.Assert;
 
-import com.sun.xml.internal.ws.encoding.MtomCodec.ByteArrayBuffer;
-
 import video.audio.recorder.v2.AudioRecorder;
 
 public class AudioPlayerFile {
 	
 private final AudioRecorder source;
 	
-	int soundItem = 0;
+	private int soundItem = 0;
 
 	private AudioFormat format = new AudioFormat(44100, 16, 2, true, true);
 
@@ -38,9 +37,6 @@ private final AudioRecorder source;
 	private volatile boolean isRecording;
 	
 	private SourceDataLine sourceLine;
-	
-	List<Long> time = new ArrayList<>();
-	private List<byte[]> audioCollector = new ArrayList<>();
 
 	protected int totalAudioOnDisk;
 
@@ -60,18 +56,24 @@ private final AudioRecorder source;
 			throw new RuntimeException(e);
 		}
 	}
-
-	public void playFromBuffer() {
-		play(System.currentTimeMillis());
-		System.out.println("Buffered audio: " + audioCollector.size());
-		for(int i = 0; i<audioCollector.size();i++){
-			sourceLine.write(audioCollector.get(i), 0, audioCollector.get(i).length);
-			System.out.println("Played from buffer: " + audioCollector.get(i).length);
-		}
+	
+	private class AudioItem{
+		List<byte[]> audio;
+		long time;
+		
 	}
-
-	public void play(long timeBorder) {
-		System.out.println("Play audio");
+	
+	volatile AudioItem[] buffer = new AudioItem[15000];
+	{
+		for(int i = 0;i<buffer.length;i++){
+			buffer[i]=new AudioItem();
+		}		
+	}
+	
+	volatile int bufferIndex;
+	volatile boolean isComplete;
+	
+	public void startBuffering(){
 		audioFiles = AUDIO.listFiles();
 		Arrays.sort(audioFiles,new Comparator<File>() {
 
@@ -79,32 +81,46 @@ private final AudioRecorder source;
 			public int compare(File arg0, File arg1) {
 				long time1 = Long.parseLong(arg0.getName());
 				long time2 = Long.parseLong(arg1.getName());
-				if(time1<time2){
-					return -1;
-				}else if(time2>time1){
-					return 1;
-				} else {
-					return 0;
-				}
+				return Long.compare(time1, time2);
 			}
 		});
-		System.out.println("Audio file list size[" + audioFiles.length +"]");
-	//	Assert.assertArrayEquals(time.toArray(), audioFiles);
+		
+		Executors.newFixedThreadPool(2).submit(() -> {
+			List<byte[]> audio;
+			for (int i = 0; (audio = getAudiouData(i)) != null; i++) {
+				buffer[bufferIndex].audio=audio;
+				buffer[bufferIndex].time=getTime(i);
+				bufferIndex++;
+				if(bufferIndex==buffer.length)
+					bufferIndex=0;
+			}
+			isComplete=true;
+		});
+		//while(bufferIndex<1000){}
+	}
 
+	public void play(long timeBorder) {
+		System.out.println("Play audio");
+		
+		
+		System.out.println("Audio file list sorted [" + Arrays.asList(audioFiles) +"]");
+		List<byte[]> fromDisc = new ArrayList<>();
 		List<byte[]> audio;
-		while(timeBorder>getTime(soundItem)&&(audio=getAudiouData(soundItem))!=null){
-	//		System.out.println("Time from buff[" + time.get(soundItem) + "], from disk[" + getTime(soundItem) + "]");
-		//	Assert.assertArrayEquals(audioCollector.get(soundItem), audio);
+
+		while(timeBorder>buffer[soundItem].time){
+			
+			if(soundItem==bufferIndex)
+				continue;
+			
+			audio = buffer[soundItem].audio;
 			for(int i = 0;i<audio.size();i++){				
 				sourceLine.write(audio.get(i), 0, audio.get(i).length);
-				//audioCollector.add(audio.get(i));
+				fromDisc.add(audio.get(i));
 			}
 			soundItem+=1;
+			if(soundItem==buffer.length)
+				soundItem=0;
 		}
-		/*for(int i = 0;i<audioCollector.size();i++)
-			Assert.assertArrayEquals("On index " + i 
-					+ " Expected " + Arrays.asList(audioCollector)
-					+ " Actual " + Arrays.asList(test),audioCollector.get(i), test.get(i));*/
 	}
 	
 	public void record() throws Exception {
@@ -125,11 +141,9 @@ private final AudioRecorder source;
 				while(isRecording){					
 					counter = source.readAudioData(counter,timeBuff,audioBuff);
 					addToDisk(timeBuff, audioBuff);
-					totalAudio+=timeBuff.size();
-					time.addAll(timeBuff);
-					audioCollector.addAll(audioBuff);
-					timeBuff= new ArrayList<>();
-					audioBuff= new ArrayList<>();
+					totalAudio+=timeBuff.size();					
+					timeBuff.clear();
+					audioBuff.clear();
 					System.out.println("counter: " + counter);					
 				}
 				System.out.println("Stop audio recording. Total: "  + totalAudio + ". Stored to disk: " + totalAudioOnDisk);
@@ -183,7 +197,10 @@ private final AudioRecorder source;
 							e.printStackTrace();
 						}
 					}
-				//	Assert.assertArrayEquals("Audio file " + audioFile.getAbsolutePath(),audioCollectorLocal.get(i), collector.toByteArray());
+					byte[] actual = collector.toByteArray();
+					Assert.assertArrayEquals("On index " + i 
+							+ " Expected " + Arrays.asList(audioCollectorLocal.get(i))
+							+ " Actual " + Arrays.asList(actual),audioCollectorLocal.get(i), actual);
 					System.out.println("Audio file path: " + audioFile.getAbsolutePath());
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -213,13 +230,7 @@ private final AudioRecorder source;
 					public int compare(File arg0, File arg1) {
 						int time1 = Integer.parseInt(arg0.getName().split("\\.")[0]);
 						int time2 = Integer.parseInt(arg1.getName().split("\\.")[0]);
-						if(time1<time2){
-							return -1;
-						}else if(time2>time1){
-							return 1;
-						} else {
-							return 0;
-						}
+						return Integer.compare(time1, time2);
 					}
 				});
 				for(int i = 0; i < listFiles.length;i++){
@@ -260,14 +271,4 @@ private final AudioRecorder source;
 			return Long.parseLong(audioFiles[soundItem].getName());
 		return 0;
 	}
-
-
-
-	public void addToDisk() {
-		addToDisk(time,audioCollector);
-		System.out.println("Stored to disk: " + totalAudioOnDisk);
-		System.out.println("Stored to disk(Audio): " + AUDIO.list().length);
-		System.out.println("Stored to disk(Bufferd): " + audioCollector.size());
-	}
-
 }

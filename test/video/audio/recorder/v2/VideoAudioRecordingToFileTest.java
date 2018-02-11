@@ -15,10 +15,10 @@ import video.audio.recorder.v2.tofile.AudioPlayerFile;
 import video.audio.recorder.v2.tofile.VideoPlayerFile;
 
 public class VideoAudioRecordingToFileTest {
-	private AudioRecorder audioSource = new AudioRecorder(5000);
+	private AudioRecorder audioSource = new AudioRecorder(15000);
 	private AudioPlayerFile audio = new AudioPlayerFile(audioSource);
 	
-	private VideoRecorder videoSource = new VideoRecorder();
+	private VideoRecorder videoSource = new VideoRecorder(15000);
 	private VideoPlayerFile video = new VideoPlayerFile(videoSource);
 
 	
@@ -28,9 +28,6 @@ public class VideoAudioRecordingToFileTest {
 		audio.record();
 		TimeUnit.SECONDS.sleep(10);
 		audio.stop();
-		//audio.playFromBuffer();
-		audio.addToDisk();
-		//audio.play(System.currentTimeMillis());
 		audio.play(System.currentTimeMillis());
 		
 
@@ -47,13 +44,7 @@ public class VideoAudioRecordingToFileTest {
 			public int compare(File arg0, File arg1) {
 				long time1 = Long.parseLong(arg0.getName());
 				long time2 = Long.parseLong(arg1.getName());
-				if(time1>time2){
-					return -1;
-				}else if(time2<time1){
-					return 1;
-				} else {
-					return 0;
-				}
+				return Long.compare(time1, time2);
 			}
 		});
 		System.out.println(Arrays.asList(listFiles));
@@ -84,7 +75,7 @@ public class VideoAudioRecordingToFileTest {
 	
 		video.record();
 		audio.record();
-		TimeUnit.SECONDS.sleep(25);
+		TimeUnit.SECONDS.sleep(30);
 		video.stop();
 		audio.stop();
 		
@@ -97,5 +88,13 @@ public class VideoAudioRecordingToFileTest {
 		
 		videoSource.cameraOff();
 		audioSource.micOff();
+	}
+	
+	@After
+	public void archiveFiles() throws Exception {
+		long recordTime = System.currentTimeMillis();
+		AudioPlayerFile.AUDIO.renameTo(new File(AudioPlayerFile.AUDIO.getName()+recordTime));
+		VideoPlayerFile.VIDEO.renameTo(new File(VideoPlayerFile.VIDEO.getName()+recordTime));
+			
 	}
 }
