@@ -15,10 +15,10 @@ import video.audio.recorder.v2.tofile.AudioPlayerFile;
 import video.audio.recorder.v2.tofile.VideoPlayerFile;
 
 public class VideoAudioRecordingToFileTest {
-	private AudioRecorder audioSource = new AudioRecorder(1500);
+	private AudioRecorder audioSource = new AudioRecorder(15000);
 	private AudioPlayerFile audio = new AudioPlayerFile(audioSource);
 	
-	private VideoRecorder videoSource = new VideoRecorder(5000);
+	private VideoRecorder videoSource = new VideoRecorder(15000);
 	private VideoPlayerFile video = new VideoPlayerFile(videoSource);
 
 	
@@ -75,7 +75,7 @@ public class VideoAudioRecordingToFileTest {
 	
 		video.record();
 		audio.record();
-		TimeUnit.SECONDS.sleep(25);
+		TimeUnit.SECONDS.sleep(60);
 		video.stop();
 		audio.stop();
 		
@@ -88,5 +88,13 @@ public class VideoAudioRecordingToFileTest {
 		
 		videoSource.cameraOff();
 		audioSource.micOff();
+	}
+	
+	@After
+	public void archiveFiles() throws Exception {
+		long recordTime = System.currentTimeMillis();
+		AudioPlayerFile.AUDIO.renameTo(new File(AudioPlayerFile.AUDIO.getName()+recordTime));
+		VideoPlayerFile.VIDEO.renameTo(new File(VideoPlayerFile.VIDEO.getName()+recordTime));
+			
 	}
 }

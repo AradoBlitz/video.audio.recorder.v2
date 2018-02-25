@@ -1,5 +1,6 @@
 package video.audio.recorder.v2.tofile;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -24,7 +26,7 @@ public class AudioPlayerFile {
 	
 private final AudioRecorder source;
 	
-	private int soundItem = 0;
+    private int soundItem = 0;
 
 	private AudioFormat format = new AudioFormat(44100, 16, 2, true, true);
 
@@ -54,9 +56,24 @@ private final AudioRecorder source;
 			throw new RuntimeException(e);
 		}
 	}
-
-	public void play(long timeBorder) {
-		System.out.println("Play audio");
+	
+	private class AudioItem{
+		volatile List<byte[]> audio;
+		volatile long time;
+		
+	}
+	
+	AudioItem[] buffer = new AudioItem[30000];
+	{
+		for(int i = 0;i<buffer.length;i++){
+			buffer[i]=new AudioItem();
+		}		
+	}
+	
+	volatile int bufferIndex;
+	volatile boolean isComplete;
+	
+	public void startBuffering(){
 		audioFiles = AUDIO.listFiles();
 		Arrays.sort(audioFiles,new Comparator<File>() {
 
@@ -67,15 +84,44 @@ private final AudioRecorder source;
 				return Long.compare(time1, time2);
 			}
 		});
+		
+		Executors.newFixedThreadPool(1).submit(() -> {
+			List<byte[]> audio;
+			for (int i = 0; (audio = getAudiouData(i)) != null; i++) {
+				buffer[bufferIndex].audio=audio;
+				buffer[bufferIndex].time=getTime(i);
+				bufferIndex++;
+				while(bufferIndex==buffer.length) {System.out.println("Waite for continue buffering.");}
+					System.out.println("Audio data is bufferd.");		
+			}
+			isComplete=true;
+		});
+		//while(bufferIndex<1000){}
+	}
+
+	public void play(long timeBorder) {
+		System.out.println("Play audio");
+		
+		
 		System.out.println("Audio file list sorted [" + Arrays.asList(audioFiles) +"]");
 		List<byte[]> fromDisc = new ArrayList<>();
 		List<byte[]> audio;
-		while(timeBorder>getTime(soundItem)&&(audio=getAudiouData(soundItem))!=null){
+
+		while(timeBorder>buffer[soundItem].time){
+			
+			if(soundItem==bufferIndex)
+				continue;
+			
+			audio = buffer[soundItem].audio;
 			for(int i = 0;i<audio.size();i++){				
 				sourceLine.write(audio.get(i), 0, audio.get(i).length);
 				fromDisc.add(audio.get(i));
 			}
 			soundItem+=1;
+			if(soundItem==buffer.length) {
+				soundItem=0;
+				bufferIndex=0;		
+			}
 		}
 	}
 	

@@ -53,11 +53,24 @@ public class VideoAudioRecordingTest {
 	
 		video.record();
 		audio.record();
-		TimeUnit.SECONDS.sleep(25);
+		TimeUnit.SECONDS.sleep(60);
 		video.stop();
 		audio.stop();
 		
 		video.play(audio);
+
+	}
+	
+	@Test
+	public void captureAudioAndVideo_2() throws Exception {
+	
+		video.record();
+		audio.record();
+		TimeUnit.SECONDS.sleep(60);
+		video.stop();
+		audio.stop();
+		
+		audio.play(video);
 
 	}
 	

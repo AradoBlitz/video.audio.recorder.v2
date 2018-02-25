@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -30,6 +32,13 @@ public class VideoPlayerFile {
 		this.source = source;		
 	}
 	
+	volatile int bufferIndex;
+	volatile BufferedImage[] bufferImage = new BufferedImage[150000];
+	volatile long[] bufferTime = new long[150000];
+	volatile boolean isComplete;
+	volatile long uploaded=0;
+	volatile long played=0;
+	
 	public void play(AudioPlayerFile audioRecorder) {
 		Screen screen = new Screen();
 		videoFile = VIDEO.listFiles();
@@ -42,21 +51,52 @@ public class VideoPlayerFile {
 				return Long.compare(time1, time2);
 			}
 		});
+		
+		Executors.newFixedThreadPool(1).submit(() -> {
+			BufferedImage image;
+			for (int i = 0; (image = getImage(i)) != null; i++) {
+				bufferImage[bufferIndex] = image;
+				bufferTime[bufferIndex] = getTime(i);
+				bufferIndex++;
+				while(bufferIndex==bufferImage.length) {System.out.println("Waite for buffering video data.");}
+					System.out.println("Video data is buffered");
+					uploaded++;
+			}
+			isComplete=true;
+			
+		});
+		
+		audioRecorder.startBuffering();
+		while (uploaded<20) {}
 		try {
 			System.out.println("Play video");
 			long startTime = System.currentTimeMillis();
 			int counter = 0;
+	
 			
 			BufferedImage image;
-			for (int i = 0; (image=getImage(i))!=null;i++) {
-				screen.setImage(image);
+			int currentImage=0;
+			for (int i = 0;;) {
+				if(i==bufferIndex){
+					if(played<=uploaded)
+						continue;
+					else
+						break;
+				}
+				screen.setImage(bufferImage[i]);
+				played++;
 				counter += 1;
-				audioRecorder.play(0!=getTime(i+1)?getTime(i+1):getTime(i));
+				audioRecorder.play(i+1<bufferTime.length?bufferTime[i+1]:bufferTime[i]);
+				i++;
+				if(i==bufferImage.length) {
+					i=0;
+					bufferIndex=0;
+				}
 			}
-			System.out.println("Frames " + counter + " was played in "
-					+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
+			
 		} finally {
 			screen.off();
+			System.out.println("Loaded video:" + uploaded + ", played videp " + played );
 		}
 
 	}
@@ -115,7 +155,7 @@ public class VideoPlayerFile {
 
 		if(i<videoFile.length)
 			try {
-				System.out.println("Show image: " + videoFile[i]);
+				System.out.println("Load image: " + videoFile[i]);
 				return ImageIO.read(videoFile[i]);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

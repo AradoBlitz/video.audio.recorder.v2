@@ -43,6 +43,24 @@ public class VideoPlayer {
 
 	}
 
+	Screen screen;
+	int currentImage = 0;
+	public void play(long time) {
+	
+		try {
+			System.out.println("Play video");
+			long startTime = System.currentTimeMillis();
+			int counter = 0;
+			if(time>=getTime(currentImage)&&getImage(currentImage+1)!=null){
+				screen.setImage(getImage(++currentImage));
+				counter += 1;
+			}
+			System.out.println("Frames " + counter + " was played in "
+					+ TimeUnit.SECONDS.toSeconds(System.currentTimeMillis() - startTime));
+		} finally {
+			
+		}
+	}
 
 	public void record() {
 		isRecording=true;
@@ -98,4 +116,14 @@ public class VideoPlayer {
 			}			
 		});		
 	}
+
+	public void openScreen() {
+		screen = new Screen();		
+	}
+
+	public void closeScreen() {
+		screen.off();
+	}
+
+	
 }
