@@ -3,9 +3,11 @@ package video.audio.recorder.v2.tofile;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -36,6 +38,7 @@ public class VideoPlayerFile {
 	volatile BufferedImage[] bufferImage = new BufferedImage[150000];
 	volatile long[] bufferTime = new long[150000];
 	volatile boolean isComplete;
+	volatile int completeIndex=-1;
 	volatile long uploaded=0;
 	volatile long played=0;
 	
@@ -63,6 +66,7 @@ public class VideoPlayerFile {
 					uploaded++;
 			}
 			isComplete=true;
+			completeIndex=bufferIndex;
 			
 		});
 		
@@ -78,10 +82,11 @@ public class VideoPlayerFile {
 			int currentImage=0;
 			for (int i = 0;;) {
 				if(i==bufferIndex){
-					if(played<=uploaded)
-						continue;
-					else
+					if(isComplete) { 
 						break;
+					} else {
+						continue;
+					}
 				}
 				screen.setImage(bufferImage[i]);
 				played++;
@@ -138,9 +143,14 @@ public class VideoPlayerFile {
 		for(int i = 0; i<time.size() && i < video.size();i++){
 			File videoFile = new File(VIDEO,time.get(i) + ".png");
 				try {
+					videoFile.createNewFile();
 					ImageIO.write(video.get(i), "PNG", videoFile);
+					System.out.println("File [" + videoFile.getAbsolutePath() + "] is not readable!");						
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					SimpleDateFormat dateFormater = new SimpleDateFormat("HH:mm:ss");
+					System.out.println("File [" + videoFile.getAbsolutePath() + "]"
+				+ " current time [" + dateFormater.format(new Date()) + "], "
+							+ "last modified [" + dateFormater.format(new Date(videoFile.lastModified())) + "]");
 					e.printStackTrace();
 				}			
 		}

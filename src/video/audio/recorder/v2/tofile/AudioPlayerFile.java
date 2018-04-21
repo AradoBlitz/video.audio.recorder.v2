@@ -91,7 +91,11 @@ private final AudioRecorder source;
 				buffer[bufferIndex].audio=audio;
 				buffer[bufferIndex].time=getTime(i);
 				bufferIndex++;
-				while(bufferIndex==buffer.length) {System.out.println("Waite for continue buffering.");}
+				if(bufferIndex==buffer.length) {
+					
+					bufferIndex=0;		
+				}
+				while(bufferIndex==soundItem) {System.out.println("Waite for continue buffering.");}
 					System.out.println("Audio data is bufferd.");		
 			}
 			isComplete=true;
@@ -109,8 +113,10 @@ private final AudioRecorder source;
 
 		while(timeBorder>buffer[soundItem].time){
 			
-			if(soundItem==bufferIndex)
+			if(soundItem==bufferIndex) {
+			soundItem-=1;
 				continue;
+			}
 			
 			audio = buffer[soundItem].audio;
 			for(int i = 0;i<audio.size();i++){				
@@ -120,7 +126,7 @@ private final AudioRecorder source;
 			soundItem+=1;
 			if(soundItem==buffer.length) {
 				soundItem=0;
-				bufferIndex=0;		
+				//bufferIndex=0;		
 			}
 		}
 	}
@@ -177,7 +183,9 @@ private final AudioRecorder source;
 					}finally {
 						out.close();
 					}
-					
+					if(!audioFile.canRead()) {
+						System.out.println("File [" + audioFile.canRead() + "] is not readable! Before control upload.");						
+					}
 					FileInputStream in = new FileInputStream(audioFile);
 					ByteArrayOutputStream collector = new ByteArrayOutputStream();
 					try{
@@ -204,6 +212,9 @@ private final AudioRecorder source;
 							+ " Expected " + Arrays.asList(audioCollectorLocal.get(i))
 							+ " Actual " + Arrays.asList(actual),audioCollectorLocal.get(i), actual);
 					System.out.println("Audio file path: " + audioFile.getAbsolutePath());
+					if(!audioFile.canRead()) {
+						System.out.println("File [" + audioFile.canRead() + "] is not readable! After control upload.");						
+					}
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

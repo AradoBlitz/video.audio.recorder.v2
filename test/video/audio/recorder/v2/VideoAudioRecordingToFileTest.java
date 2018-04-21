@@ -78,7 +78,7 @@ public class VideoAudioRecordingToFileTest {
 		TimeUnit.SECONDS.sleep(60);
 		video.stop();
 		audio.stop();
-		
+		TimeUnit.SECONDS.sleep(6);
 		video.play(audio);
 
 	}
