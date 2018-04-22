@@ -95,7 +95,7 @@ private final AudioRecorder source;
 					
 					bufferIndex=0;		
 				}
-				while(bufferIndex==soundItem) {System.out.println("Waite for continue buffering.");}
+				while(bufferIndex ==soundItem) {System.out.println("Waite for continue buffering.");}
 					System.out.println("Audio data is bufferd.");		
 			}
 			isComplete=true;
@@ -113,11 +113,6 @@ private final AudioRecorder source;
 
 		while(timeBorder>buffer[soundItem].time){
 			
-			if(soundItem==bufferIndex) {
-			soundItem-=1;
-				continue;
-			}
-			
 			audio = buffer[soundItem].audio;
 			for(int i = 0;i<audio.size();i++){				
 				sourceLine.write(audio.get(i), 0, audio.get(i).length);
@@ -126,7 +121,7 @@ private final AudioRecorder source;
 			soundItem+=1;
 			if(soundItem==buffer.length) {
 				soundItem=0;
-				//bufferIndex=0;		
+					
 			}
 		}
 	}
