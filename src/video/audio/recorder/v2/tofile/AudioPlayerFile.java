@@ -100,7 +100,6 @@ private final AudioRecorder source;
 			}
 			isComplete=true;
 		});
-		//while(bufferIndex<1000){}
 	}
 
 	public void play(long timeBorder) {
@@ -139,22 +138,16 @@ private final AudioRecorder source;
 				isRecording=true;
 				List<Long> timeBuff = new ArrayList<>();
 				List<byte[]> audioBuff = new ArrayList<>();
-				int totalAudio=0;
+				
 				totalAudioOnDisk=0;
 				while(isRecording){					
-					counter = source.readAudioData(counter,timeBuff,audioBuff);
-					addToDisk(timeBuff, audioBuff);
-					totalAudio+=timeBuff.size();					
 					timeBuff.clear();
 					audioBuff.clear();
-					System.out.println("counter: " + counter);					
+					counter = source.readAudioData(counter,timeBuff,audioBuff);
+					addToDisk(timeBuff, audioBuff);															
 				}
-				System.out.println("Stop audio recording. Total: "  + totalAudio + ". Stored to disk: " + totalAudioOnDisk);
-			
-				
-			}
-
-			
+				System.out.println("Stop audio recording. Last recorded sound: " + timeBuff.get(timeBuff.size()-1));			
+			}			
 		}.start();
 	}
 	
@@ -278,5 +271,17 @@ private final AudioRecorder source;
 		if(soundItem<audioFiles.length)
 			return Long.parseLong(audioFiles[soundItem].getName());
 		return 0;
+	}
+
+	public long lastPlayedSound() {
+		int lastImage;
+		soundItem+=1;
+		if(soundItem==0) {
+			lastImage=buffer.length-1;
+				
+		}else {
+			lastImage=soundItem-1;
+		}
+		return buffer[lastImage].time;
 	}
 }

@@ -74,15 +74,11 @@ public class VideoPlayerFile {
 		while (uploaded<20) {}
 		try {
 			System.out.println("Play video");
-			long startTime = System.currentTimeMillis();
-			int counter = 0;
-	
-			
-			BufferedImage image;
-			int currentImage=0;
-			for (int i = 0;;) {
+				for (int i = 0;;) {
 				if(i==bufferIndex){
-					if(isComplete) { 
+					if(isComplete) {
+						int lastImage = i==0?bufferTime.length-1:i-1;
+						System.out.println("Last played image: [" + bufferTime[lastImage] +"] last played sound [" + audioRecorder.lastPlayedSound() + "]");
 						break;
 					} else {
 						continue;
@@ -90,15 +86,13 @@ public class VideoPlayerFile {
 				}
 				screen.setImage(bufferImage[i]);
 				played++;
-				counter += 1;
 				audioRecorder.play(i+1<bufferTime.length?bufferTime[i+1]:bufferTime[i]);
 				i++;
 				if(i==bufferImage.length) {
 					i=0;
 					bufferIndex=0;
 				}
-			}
-			
+			}			
 		} finally {
 			screen.off();
 			System.out.println("Loaded video:" + uploaded + ", played videp " + played );
@@ -123,19 +117,15 @@ public class VideoPlayerFile {
 				List<BufferedImage> video = new ArrayList<>();
 				List<Long> time = new ArrayList<>();
 				while(isRecording){					
-					counter = source.readAudioData(counter,time,video);
-					addToDisk(time,video);
 					time.clear();
 					video.clear();
+					counter = source.readAudioData(counter,time,video);
+					addToDisk(time,video);
 					System.out.println("Video counter: " + counter);
-				}
-				
+				}				
 				System.out.println("Stop video recording");
-				System.out.println("Recorded images: " + video.size());
-			}
-
-			
-			
+				System.out.println("Last recorded image: " + time.get(time.size()-1));
+			}			
 		}.start();		
 	}
 	
