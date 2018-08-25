@@ -15,10 +15,10 @@ import video.audio.recorder.v2.tofile.AudioPlayerFile;
 import video.audio.recorder.v2.tofile.VideoPlayerFile;
 
 public class VideoAudioRecordingToFileTest {
-	private AudioRecorder audioSource = new AudioRecorder(15000);
+	private AudioRecorder audioSource = new AudioRecorder(500);
 	private AudioPlayerFile audio = new AudioPlayerFile(audioSource);
 	
-	private VideoRecorder videoSource = new VideoRecorder(15000);
+	private VideoRecorder videoSource = new VideoRecorder(500);
 	private VideoPlayerFile video = new VideoPlayerFile(videoSource);
 
 	
@@ -94,7 +94,6 @@ public class VideoAudioRecordingToFileTest {
 	public void archiveFiles() throws Exception {
 		long recordTime = System.currentTimeMillis();
 		AudioPlayerFile.AUDIO.renameTo(new File(AudioPlayerFile.AUDIO.getName()+recordTime));
-		VideoPlayerFile.VIDEO.renameTo(new File(VideoPlayerFile.VIDEO.getName()+recordTime));
-			
+		VideoPlayerFile.VIDEO.renameTo(new File(VideoPlayerFile.VIDEO.getName()+recordTime));			
 	}
 }
