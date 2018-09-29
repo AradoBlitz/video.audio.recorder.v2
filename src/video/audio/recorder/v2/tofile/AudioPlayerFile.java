@@ -40,7 +40,7 @@ private final AudioRecorder source;
 
 	protected int totalAudioOnDisk;
 
-	public static File AUDIO;
+	public static File AUDIO = new File("audio");
 
 	
 	public AudioPlayerFile(AudioRecorder source) {
@@ -95,8 +95,8 @@ private final AudioRecorder source;
 					
 					bufferIndex=0;		
 				}
-				while(bufferIndex ==soundItem) {System.out.println("Waite for continue buffering.");}
-					System.out.println("Audio data is bufferd.");		
+				//while(bufferIndex ==soundItem) {System.out.println("Waite for continue buffering.");}
+					System.out.println("Audio data is bufferd.["+ bufferIndex + "]");		
 			}
 			isComplete=true;
 		});
@@ -109,10 +109,11 @@ private final AudioRecorder source;
 		System.out.println("Audio file list sorted [" + Arrays.asList(audioFiles) +"]");
 		List<byte[]> fromDisc = new ArrayList<>();
 		List<byte[]> audio;
-
-		while(timeBorder>buffer[soundItem].time){
+		long nextTime=0;
+		while((nextTime = nextTime())!=0 && timeBorder>nextTime){
 			
 			audio = buffer[soundItem].audio;
+			System.out.println("++++++++++++++" + nextTime());
 			for(int i = 0;i<audio.size();i++){				
 				sourceLine.write(audio.get(i), 0, audio.get(i).length);
 				fromDisc.add(audio.get(i));
@@ -124,10 +125,15 @@ private final AudioRecorder source;
 			}
 		}
 	}
+
+	public long nextTime() {
+		long time = buffer[soundItem].time;
+		return time;
+	}
 	
 	public void record() throws Exception {
 		
-		AUDIO = new File("audio");
+		
 		AUDIO.mkdirs();
 		
 		new Thread(){

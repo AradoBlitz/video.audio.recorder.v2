@@ -65,8 +65,7 @@ public class VideoAudioRecordingToFileTest {
 	@Before
 	public void startCam() throws Exception {
 					
-		videoSource.cameraOn();
-		
+		videoSource.cameraOn();		
 		audioSource.micOn();		
 	}
 
@@ -80,7 +79,14 @@ public class VideoAudioRecordingToFileTest {
 		audio.stop();
 		TimeUnit.SECONDS.sleep(6);
 		video.play(audio);
-
+		System.out.println(video.LOG);
+	}
+	
+	@Test
+	public void playAudioAndVideo() throws Exception {
+		
+		video.play(audio);		
+		System.out.println(video.LOG);
 	}
 	
 	@After
@@ -90,7 +96,7 @@ public class VideoAudioRecordingToFileTest {
 		audioSource.micOff();
 	}
 	
-	@After
+	//@After
 	public void archiveFiles() throws Exception {
 		long recordTime = System.currentTimeMillis();
 		AudioPlayerFile.AUDIO.renameTo(new File(AudioPlayerFile.AUDIO.getName()+recordTime));
