@@ -79,17 +79,16 @@ public class AudioRecorder {
 				isRecording = true;
 				while (isRecording) {
 					count = targetLine.read(buff, 0, buff.length);
-					rBuff[currentBufferIndex()].time = System.currentTimeMillis();
+					AudioItem audioItem = rBuff[currentBufferIndex()];
+					audioItem.time = System.currentTimeMillis();
 					ByteArrayOutputStream convertor = new ByteArrayOutputStream();
 					convertor.write(buff, 0, count);
-					rBuff[currentBufferIndex()].data = convertor.toByteArray();
-
+					audioItem.data = convertor.toByteArray();
+					VALogger.logMic.append("time[" + audioItem.time + "]");
 					buffIndex++;
 					if (currentBufferIndex() == rBuff.length) {
 						buffIndex = 0;
 					}
-
-					System.out.println("buffIndex: " + buffIndex);
 				}
 
 			}

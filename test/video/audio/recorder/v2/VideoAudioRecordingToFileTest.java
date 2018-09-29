@@ -96,7 +96,7 @@ public class VideoAudioRecordingToFileTest {
 		audioSource.micOff();
 	}
 	
-	//@After
+	@After
 	public void archiveFiles() throws Exception {
 		long recordTime = System.currentTimeMillis();
 		AudioPlayerFile.AUDIO.renameTo(new File(AudioPlayerFile.AUDIO.getName()+recordTime));

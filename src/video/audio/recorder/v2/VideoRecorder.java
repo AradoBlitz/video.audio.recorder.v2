@@ -107,6 +107,7 @@ public class VideoRecorder {
 			public void run() {
 				// Screen screen = new Screen();
 				System.out.println("Video Start");
+				StringBuilder log = new StringBuilder();
 				while (isActive) {
 					for (; buffIndex < rBuff.length && isActive; buffIndex++) {
 						BufferedImage image = webcam.getImage();
@@ -115,12 +116,13 @@ public class VideoRecorder {
 							videoItem.time = System.currentTimeMillis();
 							videoItem.data = image;
 							// screen.setImage(image);
-							// System.out.println("Created img " +"[" + image + "] time[" + videoItem.time +
-							// "]");
+							log.append("time[" + videoItem.time + "]");
 						}
 					}
 					buffIndex = 0;
-				}
+					VALogger.logCam.append(log.toString());
+					log = new StringBuilder();
+				}				
 			}
 		}.start();
 	}

@@ -96,24 +96,24 @@ private final AudioRecorder source;
 					bufferIndex=0;		
 				}
 				//while(bufferIndex ==soundItem) {System.out.println("Waite for continue buffering.");}
-					System.out.println("Audio data is bufferd.["+ bufferIndex + "]");		
+					//System.out.println("Audio data is bufferd.["+ bufferIndex + "]");		
 			}
 			isComplete=true;
 		});
 	}
 
 	public void play(long timeBorder) {
-		System.out.println("Play audio");
+		//System.out.println("Play audio");
 		
 		
-		System.out.println("Audio file list sorted [" + Arrays.asList(audioFiles) +"]");
+		//System.out.println("Audio file list sorted [" + Arrays.asList(audioFiles) +"]");
 		List<byte[]> fromDisc = new ArrayList<>();
 		List<byte[]> audio;
 		long nextTime=0;
 		while((nextTime = nextTime())!=0 && timeBorder>nextTime){
 			
 			audio = buffer[soundItem].audio;
-			System.out.println("++++++++++++++" + nextTime());
+			//System.out.println("++++++++++++++" + nextTime());
 			for(int i = 0;i<audio.size();i++){				
 				sourceLine.write(audio.get(i), 0, audio.get(i).length);
 				fromDisc.add(audio.get(i));
@@ -169,16 +169,16 @@ private final AudioRecorder source;
 			while(i<time.size()&&previousTime == time.get(i)){
 				File audioFile = new File(audioSetDir,audioSetDir.list().length + ".snd");		
 				try {
-					System.out.println("File " + audioFile.getName() + " is exists: " + audioFile.exists());
+					//System.out.println("File " + audioFile.getName() + " is exists: " + audioFile.exists());
 					FileOutputStream out = new FileOutputStream(audioFile);
 					try{						
 						out.write(audioCollectorLocal.get(i));
-						System.out.println("File [" + audioFile.getName() + "] Stored bytes: " + Arrays.asList(audioCollectorLocal.get(i)));
+						//System.out.println("File [" + audioFile.getName() + "] Stored bytes: " + Arrays.asList(audioCollectorLocal.get(i)));
 					}finally {
 						out.close();
 					}
 					if(!audioFile.canRead()) {
-						System.out.println("File [" + audioFile.canRead() + "] is not readable! Before control upload.");						
+						System.out.println("File [" + audioFile.getName() + "] is not readable! Before control upload.");						
 					}
 					FileInputStream in = new FileInputStream(audioFile);
 					ByteArrayOutputStream collector = new ByteArrayOutputStream();
@@ -205,7 +205,7 @@ private final AudioRecorder source;
 					Assert.assertArrayEquals("On index " + i 
 							+ " Expected " + Arrays.asList(audioCollectorLocal.get(i))
 							+ " Actual " + Arrays.asList(actual),audioCollectorLocal.get(i), actual);
-					System.out.println("Audio file path: " + audioFile.getAbsolutePath());
+					//System.out.println("Audio file path: " + audioFile.getAbsolutePath());
 					if(!audioFile.canRead()) {
 						System.out.println("File [" + audioFile.canRead() + "] is not readable! After control upload.");						
 					}
@@ -250,7 +250,7 @@ private final AudioRecorder source;
 						while((counter=in.read(buff))>0){
 							collector.add(Arrays.copyOf(buff, counter));
 						}
-						System.out.println("Uploaded from file: " + listFiles[i].getAbsolutePath());
+						//System.out.println("Uploaded from file: " + listFiles[i].getAbsolutePath());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
