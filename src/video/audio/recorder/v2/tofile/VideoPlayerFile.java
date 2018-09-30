@@ -91,7 +91,7 @@ public class VideoPlayerFile {
 		Executors.newFixedThreadPool(1).submit(() -> {
 			BufferedImage image;
 			StringBuilder log = new StringBuilder();
-			for (int i = 0; (image = getImage(i)) != null; i++) {
+			for (int i = 0; (image = getImage(i)) != null;) {
 				for(bufferIndex = 0;bufferIndex<bufferImage.length && (image = getImage(i+bufferIndex)) != null;bufferIndex++) {
 					bufferImage[bufferIndex] = image;
 					long time = getTime(i+bufferIndex);
