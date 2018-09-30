@@ -81,7 +81,6 @@ public class AudioPlayer {
 				isRecording=true;
 				while(isRecording){					
 					counter = source.readAudioData(counter,time,audioCollector);
-					System.out.println("counter: " + counter);
 				}
 				System.out.println("Stop audio recording");
 				System.out.println("End audio recording. Collected " + audioCollector + "bytes.");

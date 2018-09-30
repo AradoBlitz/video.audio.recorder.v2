@@ -75,11 +75,7 @@ public class VideoPlayer {
 
 				while(isRecording){					
 					counter = source.readAudioData(counter,time,video);
-					System.out.println("Video counter: " + counter);
 				}
-				
-				System.out.println("Stop video recording");
-				System.out.println("Recorded images: " + video.size());
 			}
 			
 		}.start();		
