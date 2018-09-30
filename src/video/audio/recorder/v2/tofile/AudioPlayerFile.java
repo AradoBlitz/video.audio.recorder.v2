@@ -63,7 +63,7 @@ private final AudioRecorder source;
 		
 	}
 	
-	AudioItem[] buffer = new AudioItem[30000];
+	AudioItem[] buffer = new AudioItem[2048];
 	{
 		for(int i = 0;i<buffer.length;i++){
 			buffer[i]=new AudioItem();
