@@ -122,7 +122,7 @@ public class VideoRecorder {
 					buffIndex = 0;
 					VALogger.logCam.append(log.toString());
 					log = new StringBuilder();
-				}				
+				}
 			}
 		}.start();
 	}
