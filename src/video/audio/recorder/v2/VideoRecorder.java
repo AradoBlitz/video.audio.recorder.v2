@@ -112,12 +112,12 @@ public class VideoRecorder {
 					for (; buffIndex < rBuff.length && isActive; buffIndex++) {
 						BufferedImage image = webcam.getImage();
 						VideoItem videoItem = rBuff[buffIndex];
-						synchronized (videoItem) {
-							videoItem.time = System.currentTimeMillis();
-							videoItem.data = image;
-							// screen.setImage(image);
-							log.append("time[" + videoItem.time + "]");
-						}
+						// synchronized (videoItem) {
+						videoItem.time = System.currentTimeMillis();
+						videoItem.data = image;
+						// screen.setImage(image);
+						log.append("time[" + videoItem.time + "]");
+						// }
 					}
 					buffIndex = 0;
 					VALogger.logCam.append(log.toString());
@@ -137,13 +137,9 @@ public class VideoRecorder {
 		int rIndex;
 		while (videoPlayerFile.isActive()) {
 			rIndex = 0;
-			for (; rIndex < rBuff.length && videoPlayerFile.isActive();) {
-				for (; rIndex != buffIndex && rIndex < rBuff.length && videoPlayerFile.isActive(); rIndex++) {
-					VideoItem videoItem = rBuff[rIndex];
-					synchronized (videoItem) {
-						videoPlayerFile.put(videoItem.data,videoItem.time);	
-					}					
-				}
+			for (; rIndex != buffIndex && rIndex < rBuff.length && videoPlayerFile.isActive(); rIndex++) {
+				VideoItem videoItem = rBuff[rIndex];
+				videoPlayerFile.put(videoItem.data, videoItem.time);
 			}
 		}
 
