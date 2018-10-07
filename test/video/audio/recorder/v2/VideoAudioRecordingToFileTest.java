@@ -15,10 +15,10 @@ import video.audio.recorder.v2.tofile.AudioPlayerFile;
 import video.audio.recorder.v2.tofile.VideoPlayerFile;
 
 public class VideoAudioRecordingToFileTest {
-	private AudioRecorder audioSource = new AudioRecorder(500);
+	private AudioRecorder audioSource = new AudioRecorder(1024);
 	private AudioPlayerFile audio = new AudioPlayerFile(audioSource);
 	
-	private VideoRecorder videoSource = new VideoRecorder(500);
+	private VideoRecorder videoSource = new VideoRecorder(1024);
 	private VideoPlayerFile video = new VideoPlayerFile(videoSource);
 
 	

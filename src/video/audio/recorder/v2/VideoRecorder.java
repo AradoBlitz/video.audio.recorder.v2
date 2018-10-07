@@ -2,15 +2,13 @@ package video.audio.recorder.v2;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.concurrent.Executors;
-
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import com.github.sarxos.webcam.WebcamResolution;
 
+import video.audio.recorder.v2.inmemory.VideoPlayer;
 import video.audio.recorder.v2.tofile.VideoPlayerFile;
-import video.audio.recorder.v2.video.Screen;
 
 public class VideoRecorder {
 
@@ -134,13 +132,37 @@ public class VideoRecorder {
 	}
 
 	public void write(VideoPlayerFile videoPlayerFile) {
-		int rIndex;
-		while (videoPlayerFile.isActive()) {
-			rIndex = 0;
-			for (; rIndex != buffIndex && rIndex < rBuff.length && videoPlayerFile.isActive(); rIndex++) {
+		int rIndex = buffIndex;
+		while (videoPlayerFile.isActive()) {			
+			for (; rIndex < rBuff.length && videoPlayerFile.isActive(); rIndex++) {
+				int i = buffIndex;
+				while (rIndex == i && videoPlayerFile.isActive()) {
+					i = buffIndex;
+				}
+				
 				VideoItem videoItem = rBuff[rIndex];
 				videoPlayerFile.put(videoItem.data, videoItem.time);
+				
 			}
+			rIndex = 0;
+		}
+
+	}
+	
+	public void write(VideoPlayer videoPlayerFile) {
+		int rIndex = buffIndex;
+		while (videoPlayerFile.isActive()) {			
+			for (; rIndex < rBuff.length && videoPlayerFile.isActive(); rIndex++) {
+				int i = buffIndex;
+				while (rIndex == i && videoPlayerFile.isActive()) {
+					i = buffIndex;
+				}
+				
+				VideoItem videoItem = rBuff[rIndex];
+				videoPlayerFile.put(videoItem.data, videoItem.time);
+				
+			}
+			rIndex = 0;
 		}
 
 	}
