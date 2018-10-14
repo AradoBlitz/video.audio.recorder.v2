@@ -18,7 +18,7 @@ public class VideoAudioRecordingToFileTest {
 	private AudioRecorder audioSource = new AudioRecorder(1024);
 	private AudioPlayerFile audio = new AudioPlayerFile(audioSource);
 	
-	private VideoRecorder videoSource = new VideoRecorder(10000);
+	private VideoRecorder videoSource = new VideoRecorder(1024);
 	private VideoPlayerFile video = new VideoPlayerFile(videoSource);
 
 	

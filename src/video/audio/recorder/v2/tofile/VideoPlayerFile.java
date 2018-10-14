@@ -89,7 +89,7 @@ public class VideoPlayerFile {
 			}
 		});
 
-		ThreadsRun.executor.execute(() -> {
+		ThreadsRun.executorPlayer.execute(() -> {
 			BufferedImage image;
 			StringBuilder log = new StringBuilder();
 			for (int i = 0; (image = getImage(i)) != null;) {
@@ -114,16 +114,13 @@ public class VideoPlayerFile {
 		VIDEO.mkdirs();
 
 		isRecording = true;
-		new Thread() {
+		ThreadsRun.executor.execute(() -> {
+			System.out.println("Start video recording");
+			source.write(VideoPlayerFile.this);
 
-			@Override
-			public void run() {
-				System.out.println("Start video recording");
-				source.write(VideoPlayerFile.this);
-			}
-		}.start();
+		});
 	}
-	
+
 	public void record2() {
 
 		VIDEO.mkdirs();
@@ -190,6 +187,7 @@ public class VideoPlayerFile {
 
 	public void stop() {
 		isRecording = false;
+		ThreadsRun.executor.shutdownNow();
 	}
 
 	public BufferedImage getImage(int i) {
@@ -233,18 +231,20 @@ public class VideoPlayerFile {
 	}
 
 	public void put(BufferedImage data, long time) {
-		File videoFile = new File(VIDEO, time + ".png");
-		try {
-			VALogger.log2.append("time[" + time + "]");
-			videoFile.createNewFile();
-			ImageIO.write(data, "PNG", videoFile);
-			System.out.println("File [" + videoFile.getAbsolutePath() + "] is not readable!\n");
-		} catch (IOException e) {
-			SimpleDateFormat dateFormater = new SimpleDateFormat("HH:mm:ss");
-			System.out.println("File [" + videoFile.getAbsolutePath() + "]" + " current time ["
-					+ dateFormater.format(new Date()) + "], " + "last modified ["
-					+ dateFormater.format(new Date(videoFile.lastModified())) + "]");
-			e.printStackTrace();
-		}
+		ThreadsRun.executor.execute(() -> {
+			File videoFile = new File(VIDEO, time + ".png");
+			try {
+				VALogger.log2.append("time[" + time + "]");
+				videoFile.createNewFile();
+				ImageIO.write(data, "PNG", videoFile);
+				System.out.println("File [" + videoFile.getAbsolutePath() + "] is not readable!\n");
+			} catch (IOException e) {
+				SimpleDateFormat dateFormater = new SimpleDateFormat("HH:mm:ss");
+				System.out.println("File [" + videoFile.getAbsolutePath() + "]" + " current time ["
+						+ dateFormater.format(new Date()) + "], " + "last modified ["
+						+ dateFormater.format(new Date(videoFile.lastModified())) + "]");
+				e.printStackTrace();
+			}
+		});
 	}
 }

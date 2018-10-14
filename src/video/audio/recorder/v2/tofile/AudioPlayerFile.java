@@ -86,7 +86,7 @@ public class AudioPlayerFile {
 			}
 		});
 
-		ThreadsRun.executor.execute(() -> {
+		ThreadsRun.executorPlayer.execute(() -> {
 			List<byte[]> audio;
 			for (int i = 0; (audio = getAudiouData(i)) != null; i++) {
 				for (bufferIndex = 0; bufferIndex < buffer.length
