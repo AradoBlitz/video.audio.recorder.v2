@@ -78,6 +78,7 @@ public class AudioRecorder {
 				int count = 0;
 				isRecording = true;
 				while (isRecording) {
+					VALogger.readAudio++;
 					count = targetLine.read(buff, 0, buff.length);
 					AudioItem audioItem = rBuff[currentBufferIndex()];
 					audioItem.time = System.currentTimeMillis();

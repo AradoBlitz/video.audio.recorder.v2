@@ -108,6 +108,7 @@ public class VideoRecorder {
 				StringBuilder log = new StringBuilder();
 				while (isActive) {
 					for (; buffIndex < rBuff.length && isActive; buffIndex++) {
+						VALogger.readVideo++;
 						BufferedImage image = webcam.getImage();
 						VideoItem videoItem = rBuff[buffIndex];
 						// synchronized (videoItem) {
@@ -138,8 +139,9 @@ public class VideoRecorder {
 				int i = buffIndex;
 				while (rIndex == i && videoPlayerFile.isActive()) {
 					i = buffIndex;
+					VALogger.writeVideoWait++;
 				}
-				
+				VALogger.writeVideo++;
 				VideoItem videoItem = rBuff[rIndex];
 				videoPlayerFile.put(videoItem.data, videoItem.time);
 				
