@@ -18,7 +18,7 @@ public class VideoAudioRecordingToFileTest {
 	private AudioRecorder audioSource = new AudioRecorder(1024);
 	private AudioPlayerFile audio = new AudioPlayerFile(audioSource);
 	
-	private VideoRecorder videoSource = new VideoRecorder(1024);
+	private VideoRecorder videoSource = new VideoRecorder(10000);
 	private VideoPlayerFile video = new VideoPlayerFile(videoSource);
 
 	
@@ -62,7 +62,7 @@ public class VideoAudioRecordingToFileTest {
 		video.play();		
 	}
 	
-	@Before
+	//@Before
 	public void startCam() throws Exception {
 					
 		videoSource.cameraOn();		
@@ -71,15 +71,25 @@ public class VideoAudioRecordingToFileTest {
 
 	@Test
 	public void captureAudioAndVideo() throws Exception {
-	
+		startCam();
+		try {
 		video.record();
-		audio.record();
+		audio.record();		
 		TimeUnit.SECONDS.sleep(60);
 		video.stop();
 		audio.stop();
+		} finally {
+			stopCam();
+		}
 		TimeUnit.SECONDS.sleep(6);
 		video.play(audio);
 		System.out.println(video.LOG);
+	
+		System.out.println("readAudio [" + VALogger.readAudio + "]");
+		System.out.println("writeAudio [" + VALogger.writeAudio + "]");
+		System.out.println("readVideo [" + VALogger.readVideo + "]");
+		System.out.println("writeVideo [" + VALogger.writeVideo + "]");
+		System.out.println("writeVideoWait [" + VALogger.writeVideoWait + "]");
 	}
 	
 	@Test
@@ -89,7 +99,7 @@ public class VideoAudioRecordingToFileTest {
 		System.out.println(video.LOG);
 	}
 	
-	@After
+	//@After
 	public void stopCam() throws Exception{
 		
 		videoSource.cameraOff();
