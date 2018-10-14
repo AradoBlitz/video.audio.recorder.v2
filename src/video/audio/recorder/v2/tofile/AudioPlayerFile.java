@@ -21,6 +21,8 @@ import javax.sound.sampled.SourceDataLine;
 import org.junit.Assert;
 
 import video.audio.recorder.v2.AudioRecorder;
+import video.audio.recorder.v2.ThreadsRun;
+import video.audio.recorder.v2.VALogger;
 
 public class AudioPlayerFile {
 
@@ -62,7 +64,7 @@ public class AudioPlayerFile {
 
 	}
 
-	AudioItem[] buffer = new AudioItem[2048];
+	AudioItem[] buffer = new AudioItem[1024];
 	{
 		for (int i = 0; i < buffer.length; i++) {
 			buffer[i] = new AudioItem();
@@ -84,7 +86,7 @@ public class AudioPlayerFile {
 			}
 		});
 
-		Executors.newFixedThreadPool(1).submit(() -> {
+		ThreadsRun.executor.execute(() -> {
 			List<byte[]> audio;
 			for (int i = 0; (audio = getAudiouData(i)) != null; i++) {
 				for (bufferIndex = 0; bufferIndex < buffer.length
@@ -100,17 +102,14 @@ public class AudioPlayerFile {
 	}
 
 	public void play(long timeBorder) {
-		// System.out.println("Play audio");
-
-		// System.out.println("Audio file list sorted [" + Arrays.asList(audioFiles)
-		// +"]");
+	
 		List<byte[]> fromDisc = new ArrayList<>();
 		List<byte[]> audio;
 		long nextTime = 0;
 		while ((nextTime = nextTime()) != 0 && timeBorder > nextTime) {
 
 			audio = buffer[soundItem].audio;
-			// System.out.println("++++++++++++++" + nextTime());
+			
 			for (int i = 0; i < audio.size(); i++) {
 				sourceLine.write(audio.get(i), 0, audio.get(i).length);
 				fromDisc.add(audio.get(i));
@@ -132,25 +131,25 @@ public class AudioPlayerFile {
 
 		AUDIO.mkdirs();
 
-		new Thread() {
-
-			public void run() {
+		
+			ThreadsRun.executor.execute(()-> {
 				System.out.println("Start audio recording");
 				int counter = source.currentBufferIndex();
 				isRecording = true;
 				List<Long> timeBuff = new ArrayList<>();
 				List<byte[]> audioBuff = new ArrayList<>();
 
-				totalAudioOnDisk = 0;
+				
 				while (isRecording) {
+					
 					timeBuff.clear();
 					audioBuff.clear();
 					counter = source.readAudioData(counter, timeBuff, audioBuff);
 					addToDisk(timeBuff, audioBuff);
 				}
 				System.out.println("Stop audio recording. Last recorded sound: " + timeBuff.get(timeBuff.size() - 1));
-			}
-		}.start();
+			});
+		
 	}
 
 	private void addToDisk(List<Long> time, List<byte[]> audioCollectorLocal) {
@@ -163,6 +162,7 @@ public class AudioPlayerFile {
 				audioSetDir.mkdir();
 			}
 			while (i < time.size() && previousTime == time.get(i)) {
+				VALogger.writeAudio++;
 				File audioFile = new File(audioSetDir, audioSetDir.list().length + ".snd");
 				try {
 					// System.out.println("File " + audioFile.getName() + " is exists: " +

@@ -69,30 +69,27 @@ public class AudioRecorder {
 
 	public void micOn() {
 
-		new Thread() {
-
-			@Override
-			public void run() {
-				System.out.println("Audio Start");
-				byte[] buff = new byte[1024];
-				int count = 0;
-				isRecording = true;
-				while (isRecording) {
-					count = targetLine.read(buff, 0, buff.length);
-					AudioItem audioItem = rBuff[currentBufferIndex()];
-					audioItem.time = System.currentTimeMillis();
-					ByteArrayOutputStream convertor = new ByteArrayOutputStream();
-					convertor.write(buff, 0, count);
-					audioItem.data = convertor.toByteArray();
-					VALogger.logMic.append("time[" + audioItem.time + "]");
-					buffIndex++;
-					if (currentBufferIndex() == rBuff.length) {
-						buffIndex = 0;
-					}
+		ThreadsRun.executor.execute(() -> {
+			System.out.println("Audio Start");
+			byte[] buff = new byte[1024];
+			int count = 0;
+			isRecording = true;
+			while (isRecording) {
+				VALogger.readAudio++;
+				count = targetLine.read(buff, 0, buff.length);
+				AudioItem audioItem = rBuff[currentBufferIndex()];
+				audioItem.time = System.currentTimeMillis();
+				ByteArrayOutputStream convertor = new ByteArrayOutputStream();
+				convertor.write(buff, 0, count);
+				audioItem.data = convertor.toByteArray();
+				VALogger.logMic.append("time[" + audioItem.time + "]");
+				buffIndex++;
+				if (currentBufferIndex() == rBuff.length) {
+					buffIndex = 0;
 				}
-
 			}
-		}.start();
+
+		});
 	}
 
 	public void micOff() {

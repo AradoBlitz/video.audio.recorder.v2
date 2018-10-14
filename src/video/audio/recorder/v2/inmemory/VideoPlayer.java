@@ -70,11 +70,9 @@ public class VideoPlayer {
 			public void run() {
 				System.out.println("Start video recording");
 				System.out.println("Go!");//help to know to start counting.
-				
-				int counter = source.currentBufferIndex();
 
 				while(isRecording){					
-					counter = source.readAudioData(counter,time,video);
+					source.write(VideoPlayer.this);
 				}
 			}
 			
@@ -119,6 +117,17 @@ public class VideoPlayer {
 
 	public void closeScreen() {
 		screen.off();
+	}
+
+	public boolean isActive() {
+		// TODO Auto-generated method stub
+		return isRecording;
+	}
+
+	public void put(BufferedImage data, long time2) {
+		video.add(data);
+		time.add(time2);
+		
 	}
 
 	

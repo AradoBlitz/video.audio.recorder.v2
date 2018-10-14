@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
+import video.audio.recorder.v2.ThreadsRun;
 import video.audio.recorder.v2.VALogger;
 import video.audio.recorder.v2.VideoRecorder;
 import video.audio.recorder.v2.video.Screen;
@@ -88,13 +89,14 @@ public class VideoPlayerFile {
 			}
 		});
 
-		Executors.newFixedThreadPool(1).submit(() -> {
+		ThreadsRun.executor.execute(() -> {
 			BufferedImage image;
 			StringBuilder log = new StringBuilder();
 			for (int i = 0; (image = getImage(i)) != null;) {
-				for(bufferIndex = 0;bufferIndex<bufferImage.length && (image = getImage(i+bufferIndex)) != null;bufferIndex++) {
+				for (bufferIndex = 0; bufferIndex < bufferImage.length
+						&& (image = getImage(i + bufferIndex)) != null; bufferIndex++) {
 					bufferImage[bufferIndex] = image;
-					long time = getTime(i+bufferIndex);
+					long time = getTime(i + bufferIndex);
 					bufferTime[bufferIndex] = time;
 					log.append("time[" + time + "]");
 					uploaded++;
@@ -120,6 +122,70 @@ public class VideoPlayerFile {
 				source.write(VideoPlayerFile.this);
 			}
 		}.start();
+	}
+	
+	public void record2() {
+
+		VIDEO.mkdirs();
+
+		isRecording = true;
+
+		ThreadsRun.executor.execute(() -> {
+			System.out.println("Start video recording");
+			int counter = source.currentBufferIndex();
+
+			List<BufferedImage> video = new ArrayList<>();
+
+			List<Long> time = new ArrayList<>();
+
+			while (isRecording) {
+
+				time.clear();
+
+				video.clear();
+
+				counter = source.readVideoData(counter, time, video);
+
+				addToDisk(time, video);
+
+				System.out.println("Video counter: " + counter);
+
+			}
+
+			System.out.println("Stop video recording");
+		});
+
+	}
+
+	private void addToDisk(List<Long> time, List<BufferedImage> video) {
+
+		for (int i = 0; i < time.size() && i < video.size(); i++) {
+
+			File videoFile = new File(VIDEO, time.get(i) + ".png");
+
+			try {
+
+				videoFile.createNewFile();
+
+				ImageIO.write(video.get(i), "PNG", videoFile);
+
+				System.out.println("File [" + videoFile.getAbsolutePath() + "] is not readable!");
+
+			} catch (IOException e) {
+
+				SimpleDateFormat dateFormater = new SimpleDateFormat("HH:mm:ss");
+
+				System.out.println("File [" + videoFile.getAbsolutePath() + "]"
+
+						+ " current time [" + dateFormater.format(new Date()) + "], "
+
+						+ "last modified [" + dateFormater.format(new Date(videoFile.lastModified())) + "]");
+
+				e.printStackTrace();
+
+			}
+
+		}
 	}
 
 	public void stop() {

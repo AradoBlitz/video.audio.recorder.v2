@@ -82,8 +82,9 @@ public class VideoRecorder {
 		webcam.close();
 	}
 
-	public int readAudioData(int counter, List<Long> time, List<BufferedImage> videoCollector) {
+	public int readVideoData(int counter, List<Long> time, List<BufferedImage> videoCollector) {
 		while (counter != currentBufferIndex()) {
+			VALogger.writeVideo++;
 			VideoItem videoItem = rBuff[counter];
 			synchronized (videoItem) {
 				time.add(videoItem.time);
@@ -99,30 +100,28 @@ public class VideoRecorder {
 	public void cameraOn() {
 
 		activateCam();
-		new Thread() {
 
-			@Override
-			public void run() {
-				// Screen screen = new Screen();
-				System.out.println("Video Start");
-				StringBuilder log = new StringBuilder();
-				while (isActive) {
-					for (; buffIndex < rBuff.length && isActive; buffIndex++) {
-						BufferedImage image = webcam.getImage();
-						VideoItem videoItem = rBuff[buffIndex];
-						// synchronized (videoItem) {
-						videoItem.time = System.currentTimeMillis();
-						videoItem.data = image;
-						// screen.setImage(image);
-						log.append("time[" + videoItem.time + "]");
-						// }
-					}
-					buffIndex = 0;
-					VALogger.logCam.append(log.toString());
-					log = new StringBuilder();
+		ThreadsRun.executor.execute(() -> {
+			// Screen screen = new Screen();
+			System.out.println("Video Start");
+			StringBuilder log = new StringBuilder();
+			while (isActive) {
+				for (; buffIndex < rBuff.length && isActive; buffIndex++) {
+					VALogger.readVideo++;
+					BufferedImage image = webcam.getImage();
+					VideoItem videoItem = rBuff[buffIndex];
+					// synchronized (videoItem) {
+					videoItem.time = System.currentTimeMillis();
+					videoItem.data = image;
+					// screen.setImage(image);
+					log.append("time[" + videoItem.time + "]");
+					// }
 				}
+				buffIndex = 0;
+				VALogger.logCam.append(log.toString());
+				log = new StringBuilder();
 			}
-		}.start();
+		});
 	}
 
 	public void cameraOff() {
@@ -133,34 +132,35 @@ public class VideoRecorder {
 
 	public void write(VideoPlayerFile videoPlayerFile) {
 		int rIndex = buffIndex;
-		while (videoPlayerFile.isActive()) {			
+		while (videoPlayerFile.isActive()) {
 			for (; rIndex < rBuff.length && videoPlayerFile.isActive(); rIndex++) {
 				int i = buffIndex;
 				while (rIndex == i && videoPlayerFile.isActive()) {
 					i = buffIndex;
+					VALogger.writeVideoWait++;
 				}
-				
+				VALogger.writeVideo++;
 				VideoItem videoItem = rBuff[rIndex];
 				videoPlayerFile.put(videoItem.data, videoItem.time);
-				
+
 			}
 			rIndex = 0;
 		}
 
 	}
-	
+
 	public void write(VideoPlayer videoPlayerFile) {
 		int rIndex = buffIndex;
-		while (videoPlayerFile.isActive()) {			
+		while (videoPlayerFile.isActive()) {
 			for (; rIndex < rBuff.length && videoPlayerFile.isActive(); rIndex++) {
 				int i = buffIndex;
 				while (rIndex == i && videoPlayerFile.isActive()) {
 					i = buffIndex;
 				}
-				
+
 				VideoItem videoItem = rBuff[rIndex];
 				videoPlayerFile.put(videoItem.data, videoItem.time);
-				
+
 			}
 			rIndex = 0;
 		}
