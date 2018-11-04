@@ -9,8 +9,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -36,9 +34,20 @@ public class VideoPlayerFile {
 
 	public final StringBuilder LOG = new StringBuilder();
 
+	private static class VideoItem {
+
+		public volatile long time;
+		public volatile BufferedImage data;
+
+	}
+	
 	volatile int bufferIndex;
-	volatile BufferedImage[] bufferImage = new BufferedImage[2048];
-	volatile long[] bufferTime = new long[2048];
+	volatile VideoItem[] bufferImage = new VideoItem[1024];
+	{
+		for (int i = 0; i < bufferImage.length; i++)
+			bufferImage[i] = new VideoItem();
+	}
+	
 	volatile boolean isComplete;
 	volatile int completeIndex = -1;
 	volatile long uploaded = 0;
@@ -54,16 +63,22 @@ public class VideoPlayerFile {
 
 		try {
 			System.out.println("Play video");
+			
+			
 			while (!isComplete) {
-				for (int i = 0; i < bufferImage.length; i++) {
-					while (bufferImage[i] == null && !isComplete) {
-					}
-					BufferedImage image = bufferImage[i];
-					long timeBorder = i + 1 < bufferTime.length ? bufferTime[i + 1] : bufferTime[i];
-					bufferImage[i] = null;
-					VALogger.log.append("time[" + timeBorder + "]");
-					screen.setImage(image);
-					audioRecorder.play(timeBorder);
+				for (int i = 0; i+1 < bufferImage.length && !isComplete; i++) {
+					VideoItem videoItem = bufferImage[i];
+					while((videoItem.data==null || videoItem.time==0) && !isComplete) {}
+					long timeBorder = 0;
+					synchronized (videoItem) {
+						System.out.println("Index " + i + " time[" + videoItem.time + "] " + "img " + videoItem.data);
+						
+						VALogger.log.append("time[" + videoItem.time + "]");
+						
+						screen.setImage(videoItem.data);
+						VALogger.pWriteVideo++;
+						audioRecorder.play( videoItem.time);
+					}					
 				}
 			}
 		} finally {
@@ -90,18 +105,27 @@ public class VideoPlayerFile {
 		});
 
 		ThreadsRun.executorPlayer.execute(() -> {
-			BufferedImage image;
 			StringBuilder log = new StringBuilder();
-			for (int i = 0; (image = getImage(i)) != null;) {
-				for (bufferIndex = 0; bufferIndex < bufferImage.length
-						&& (image = getImage(i + bufferIndex)) != null; bufferIndex++) {
-					bufferImage[bufferIndex] = image;
-					long time = getTime(i + bufferIndex);
-					bufferTime[bufferIndex] = time;
-					log.append("time[" + time + "]");
-					uploaded++;
+			for (int i = 0; i < videoFile.length;) {
+				for (bufferIndex = 0; bufferIndex < bufferImage.length && i < videoFile.length; bufferIndex++) {
+					File file = videoFile[i++];
+					try {
+						VideoItem videoItem = bufferImage[bufferIndex];
+						synchronized (videoItem) {
+							videoItem.data = ImageIO.read(file);
+							videoItem.time = Long.parseLong(file.getName().split(".png")[0]);	
+							
+							log.append("time[" + videoItem.time + "]");
+							VALogger.pReadVideo++;
+							System.out.println(i + " " + bufferIndex + " Video file " + file + " time " + videoItem.time + " read " + videoItem.data);
+						}
+						uploaded++;
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-				i = bufferIndex;
+
 			}
 			isComplete = true;
 			completeIndex = bufferIndex;
@@ -187,7 +211,7 @@ public class VideoPlayerFile {
 
 	public void stop() {
 		isRecording = false;
-		ThreadsRun.executor.shutdownNow();
+		// while(!ThreadsRun.executor.isTerminated()) {}
 	}
 
 	public BufferedImage getImage(int i) {
@@ -232,6 +256,8 @@ public class VideoPlayerFile {
 
 	public void put(BufferedImage data, long time) {
 		ThreadsRun.executor.execute(() -> {
+			if (data == null)
+				return;
 			File videoFile = new File(VIDEO, time + ".png");
 			try {
 				VALogger.log2.append("time[" + time + "]");

@@ -12,4 +12,9 @@ public class VALogger {
 	public static volatile int writeVideo=0;
 	public static volatile int writeVideoWait=0;
 	
+	public static volatile int pReadAudio=0;
+	public static volatile int pWriteAudio=0;
+	public static volatile int pReadVideo=0;
+	public static volatile int pWriteVideo=0;
+	
 }

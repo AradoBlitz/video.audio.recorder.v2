@@ -6,8 +6,8 @@ import java.util.concurrent.Executors;
 
 public class ThreadsRun {
 	
-	public final static ExecutorService executor = Executors.newCachedThreadPool();
+	public final static ExecutorService executor = Executors.newFixedThreadPool(100);
 	
-	public final static ExecutorService executorPlayer = Executors.newCachedThreadPool();
+	public final static ExecutorService executorPlayer = Executors.newFixedThreadPool(100);
 
 }

@@ -16,7 +16,7 @@ public class VideoRecorder {
 
 	private volatile boolean isActive = true;
 
-	private volatile VideoItem[] rBuff;
+	private VideoItem[] rBuff;
 
 	private volatile int buffIndex;
 
@@ -109,12 +109,16 @@ public class VideoRecorder {
 				for (; buffIndex < rBuff.length && isActive; buffIndex++) {
 					VALogger.readVideo++;
 					BufferedImage image = webcam.getImage();
-					VideoItem videoItem = rBuff[buffIndex];
-					// synchronized (videoItem) {
-					videoItem.time = System.currentTimeMillis();
-					videoItem.data = image;
-					// screen.setImage(image);
-					log.append("time[" + videoItem.time + "]");
+					synchronized (this) {
+						if(Thread.currentThread().isInterrupted())
+							break;
+						VideoItem videoItem = rBuff[buffIndex];
+						// synchronized (videoItem) {
+						videoItem.time = System.currentTimeMillis();
+						videoItem.data = image;
+						// screen.setImage(image);
+						log.append("time[" + videoItem.time + "]");
+					}
 					// }
 				}
 				buffIndex = 0;
